@@ -2,11 +2,10 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { clearToken, getStoredUser } from '../lib/auth';
 
 const navItems = [
+  { to: '/itineraries', label: 'Itinerarios (Principal)' },
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/clients', label: 'Clientes' },
-  { to: '/activities', label: 'Actividades' },
-  { to: '/schedules', label: 'Horarios' },
-  { to: '/itineraries', label: 'Itinerarios' },
+  { to: '/activities', label: 'Actividades y Horarios' },
 ];
 
 const Layout = () => {

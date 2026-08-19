@@ -13,6 +13,15 @@ export const listItineraries = async (_req: Request, res: Response, next: NextFu
   }
 };
 
+export const getItineraryById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const itinerary = await itineraryService.getById(Number(req.params.id));
+    res.status(200).json(itinerary);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createItinerary = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const operatorUserId = req.user?.id && req.user.id.length > 0 ? req.user.id : '11111111-1111-1111-1111-111111111111';
@@ -20,6 +29,7 @@ export const createItinerary = async (req: Request, res: Response, next: NextFun
       clientId: Number(req.body.clientId),
       observations: req.body.observations ?? null,
       status: req.body.status,
+      items: req.body.items,
       operatorUserId,
     });
     res.status(201).json(itinerary);
@@ -32,6 +42,15 @@ export const updateItinerary = async (req: Request, res: Response, next: NextFun
   try {
     const itinerary = await itineraryService.update(Number(req.params.id), req.body);
     res.status(200).json(itinerary);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteItinerary = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await itineraryService.delete(Number(req.params.id));
+    res.status(200).json({ message: 'Itinerario eliminado correctamente' });
   } catch (error) {
     next(error);
   }
@@ -70,6 +89,24 @@ export const createSchedule = async (req: Request, res: Response, next: NextFunc
   }
 };
 
+export const updateSchedule = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const schedule = await itineraryService.updateSchedule(Number(req.params.id), req.body);
+    res.status(200).json(schedule);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteSchedule = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await itineraryService.deleteSchedule(Number(req.params.id));
+    res.status(200).json({ message: 'Horario eliminado correctamente' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const generateItineraryPdfController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const itinerary = await itineraryService.confirmAndGeneratePdf(Number(req.params.id));
@@ -89,9 +126,11 @@ export const generateItineraryPdfController = async (req: Request, res: Response
       })),
     };
 
+    const pdfBuffer = await generateItineraryPdf(normalizedItinerary);
+
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="itinerario-${itinerary.id}.pdf"`);
-    res.status(200).send(generateItineraryPdf(normalizedItinerary));
+    res.status(200).send(pdfBuffer);
   } catch (error) {
     next(error);
   }

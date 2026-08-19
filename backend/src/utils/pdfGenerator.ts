@@ -1,10 +1,12 @@
+import PDFDocument from 'pdfkit';
+
 type ItineraryPdfData = {
   id: number;
   status: string;
   observations?: string | null;
   totalAmount?: number | string | null;
   createdAt?: Date | string | null;
-  client?: { fullName?: string | null; email?: string | null; phone?: string | null } | null;
+  client?: { fullName?: string | null; email?: string | null; phone?: string | null; documentNumber?: string | null } | null;
   operator?: { fullName?: string | null; email?: string | null } | null;
   items?: Array<{
     id: number;
@@ -16,101 +18,122 @@ type ItineraryPdfData = {
   }>;
 };
 
-const escapePdfText = (value: string) =>
-  value
-    .replace(/\\/g, '\\\\')
-    .replace(/\(/g, '\\(')
-    .replace(/\)/g, '\\)');
-
 const formatCurrency = (value: number | string | null | undefined) =>
-  `$${Number(value || 0).toFixed(2)}`;
+  `$${Number(value || 0).toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const formatDate = (value: Date | string | null | undefined) => {
-  if (!value) return 'Sin fecha';
+  if (!value) return 'N/A';
   const date = typeof value === 'string' ? new Date(value) : value;
   return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString('es-CO');
 };
 
 const formatTime = (value: Date | string | null | undefined) => {
-  if (!value) return 'Sin horario';
+  if (!value) return 'N/A';
   const date = typeof value === 'string' ? new Date(value) : value;
   if (Number.isNaN(date.getTime())) return String(value);
   return date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 };
 
-export const generateItineraryPdf = (itinerary: ItineraryPdfData) => {
-  const lines = [
-    'AGENCIA CARTAGENA TOURS',
-    'Itinerario turístico premium',
-    'www.cartagenatours.example',
-    '',
-    `Número: IT-${itinerary.id}`,
-    `Cliente: ${itinerary.client?.fullName || 'Sin cliente'}`,
-    `Correo: ${itinerary.client?.email || 'Sin correo'}`,
-    `Teléfono: ${itinerary.client?.phone || 'Sin teléfono'}`,
-    `Operador: ${itinerary.operator?.fullName || 'Sin operador'}`,
-    `Estado: ${itinerary.status === 'confirmed' ? 'Confirmado' : 'Borrador'}`,
-    `Creado: ${formatDate(itinerary.createdAt)}`,
-    '',
-    'Detalle del itinerario',
-    'Plan de experiencia personalizado',
-    'Incluye transporte, guías locales y acceso preferencial.',
-  ];
+export const generateItineraryPdf = (itinerary: ItineraryPdfData): Promise<Buffer> => {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ margin: 40, size: 'LETTER' });
+    const buffers: Buffer[] = [];
 
-  if (itinerary.observations) {
-    lines.push(`Observaciones: ${itinerary.observations}`);
-  }
+    doc.on('data', (chunk) => buffers.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(buffers)));
+    doc.on('error', (err) => reject(err));
 
-  lines.push('');
+    // Colors
+    const primaryColor = '#0F172A'; // Slate 900
+    const accentColor = '#10B981'; // Emerald 500
+    const textColor = '#334155'; // Slate 700
+    const lightBg = '#F8FAFC'; // Slate 50
 
-  (itinerary.items || []).forEach((item, index) => {
-    lines.push(`${index + 1}. ${item.activity?.name || 'Actividad sin nombre'}`);
-    lines.push(`   Fecha: ${formatDate(item.schedule?.scheduleDate)}`);
-    lines.push(`   Horario: ${formatTime(item.schedule?.startTime)} - ${formatTime(item.schedule?.endTime)}`);
-    lines.push(`   Personas: ${item.quantityPeople || 1}`);
-    lines.push(`   Precio unitario: ${formatCurrency(item.unitPrice)}`);
-    lines.push(`   Subtotal: ${formatCurrency(item.subtotal)}`);
-    lines.push('');
+    // Header / Membrete
+    doc.rect(0, 0, 612, 110).fill(primaryColor);
+
+    doc.fillColor('#FFFFFF').fontSize(22).font('Helvetica-Bold').text('CARTAGENA TOURS', 40, 30);
+    doc.fontSize(10).font('Helvetica').text('Agencia de Viajes & Experiencias Turísticas', 40, 58);
+    doc.text('NIT: 900.123.456-7 | info@cartagenatours.co | +57 300 000 0000', 40, 72);
+
+    doc.fillColor(accentColor).fontSize(16).font('Helvetica-Bold').text('ITINERARIO DE VIAJE', 400, 30, { align: 'right' });
+    doc.fillColor('#94A3B8').fontSize(11).font('Helvetica').text(`Nº IT-${String(itinerary.id).padStart(5, '0')}`, 400, 52, { align: 'right' });
+    doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold').text(`ESTADO: ${itinerary.status === 'confirmed' ? 'CONFIRMADO' : 'BORRADOR'}`, 400, 72, { align: 'right' });
+
+    // Client & Trip Info Box
+    let y = 130;
+    doc.rect(40, y, 532, 85).fill(lightBg).stroke('#E2E8F0');
+
+    doc.fillColor(primaryColor).fontSize(11).font('Helvetica-Bold').text('INFORMACIÓN DEL CLIENTE', 55, y + 12);
+    doc.fillColor(textColor).fontSize(10).font('Helvetica');
+    doc.text(`Cliente: ${itinerary.client?.fullName || 'N/A'}`, 55, y + 32);
+    doc.text(`Documento: ${itinerary.client?.documentNumber || 'N/A'}`, 55, y + 48);
+    doc.text(`Correo: ${itinerary.client?.email || 'N/A'}`, 55, y + 64);
+
+    doc.fillColor(primaryColor).fontSize(11).font('Helvetica-Bold').text('DETALLES DE RESERVA', 320, y + 12);
+    doc.fillColor(textColor).fontSize(10).font('Helvetica');
+    doc.text(`Fecha Emisión: ${formatDate(itinerary.createdAt)}`, 320, y + 32);
+    doc.text(`Operador Resp.: ${itinerary.operator?.fullName || 'Operador Turístico'}`, 320, y + 48);
+    doc.text(`Teléfono: ${itinerary.client?.phone || 'N/A'}`, 320, y + 64);
+
+    // Items Table Header
+    y += 105;
+    doc.rect(40, y, 532, 24).fill(primaryColor);
+    doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
+    doc.text('ACTIVIDAD / EXPERIENCIA', 50, y + 7);
+    doc.text('FECHA Y HORARIO', 260, y + 7);
+    doc.text('PAX', 410, y + 7, { width: 30, align: 'center' });
+    doc.text('P. UNIT', 450, y + 7, { width: 55, align: 'right' });
+    doc.text('SUBTOTAL', 510, y + 7, { width: 55, align: 'right' });
+
+    y += 24;
+    doc.font('Helvetica').fontSize(9).fillColor(textColor);
+
+    const items = itinerary.items || [];
+    if (items.length === 0) {
+      y += 10;
+      doc.text('No hay actividades registradas en este itinerario.', 50, y);
+      y += 20;
+    } else {
+      items.forEach((item, index) => {
+        const bg = index % 2 === 0 ? '#FFFFFF' : lightBg;
+        doc.rect(40, y, 532, 28).fill(bg);
+
+        doc.fillColor(primaryColor).font('Helvetica-Bold').text(item.activity?.name || 'Actividad', 50, y + 8, { width: 200 });
+        doc.fillColor(textColor).font('Helvetica').text(
+          `${formatDate(item.schedule?.scheduleDate)} (${formatTime(item.schedule?.startTime)} - ${formatTime(item.schedule?.endTime)})`,
+          260,
+          y + 8,
+          { width: 140 }
+        );
+        doc.text(String(item.quantityPeople || 1), 410, y + 8, { width: 30, align: 'center' });
+        doc.text(formatCurrency(item.unitPrice), 450, y + 8, { width: 55, align: 'right' });
+        doc.fillColor(primaryColor).font('Helvetica-Bold').text(formatCurrency(item.subtotal), 510, y + 8, { width: 55, align: 'right' });
+
+        y += 28;
+      });
+    }
+
+    // Observations & Total Box
+    y += 15;
+    if (itinerary.observations) {
+      doc.fillColor(primaryColor).fontSize(10).font('Helvetica-Bold').text('OBSERVACIONES / NOTAS:', 40, y);
+      y += 14;
+      doc.fillColor(textColor).fontSize(9).font('Helvetica').text(itinerary.observations, 40, y, { width: 320 });
+    }
+
+    // Total box on the right
+    doc.rect(380, y - 10, 192, 45).fill(lightBg).stroke(accentColor);
+    doc.fillColor(primaryColor).fontSize(11).font('Helvetica-Bold').text('TOTAL A PAGAR:', 395, y + 4);
+    doc.fillColor(accentColor).fontSize(16).font('Helvetica-Bold').text(formatCurrency(itinerary.totalAmount), 395, y + 20, { align: 'right', width: 165 });
+
+    // Footer
+    const footerY = 730;
+    doc.rect(40, footerY, 532, 1).fill('#CBD5E1');
+    doc.fillColor('#94A3B8').fontSize(8).font('Helvetica');
+    doc.text('¡Gracias por elegir Cartagena Tours! Por favor conserve este comprobante durante todo el recorrido.', 40, footerY + 10, { align: 'center' });
+    doc.text('Documento generado automáticamente · Estado confirmado sujeto a la presentación del voucher.', 40, footerY + 22, { align: 'center' });
+
+    doc.end();
   });
-
-  lines.push(`Total general: ${formatCurrency(itinerary.totalAmount)}`);
-  lines.push('');
-  lines.push('Este documento fue generado automáticamente desde el módulo de itinerarios.');
-
-  const contentLines = lines.map((line, index) => {
-    const y = 760 - index * 12;
-    return `BT /F1 12 Tf 50 ${y} Td (${escapePdfText(line)}) Tj ET`;
-  });
-
-  const content = contentLines.join('\n');
-  const contentLength = Buffer.byteLength(content, 'utf8');
-
-  const objects = [
-    '<< /Type /Catalog /Pages 2 0 R >>',
-    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
-    `<< /Length ${contentLength} >>\nstream\n${content}\nendstream`,
-    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
-  ];
-
-  const pdfParts: string[] = ['%PDF-1.4'];
-  const offsets: number[] = [];
-  let pdf = '';
-
-  objects.forEach((object, index) => {
-    offsets.push(Buffer.byteLength(pdf, 'utf8'));
-    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
-  });
-
-  const xrefOffset = Buffer.byteLength(pdf, 'utf8');
-  pdfParts.push(pdf);
-  pdfParts.push(`xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`);
-
-  offsets.forEach((offset) => {
-    pdfParts.push(`${String(offset).padStart(10, '0')} 00000 n \n`);
-  });
-
-  pdfParts.push(`trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
-
-  return Buffer.from(pdfParts.join(''), 'binary');
 };

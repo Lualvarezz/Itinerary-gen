@@ -3,7 +3,6 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ClientsPage from './pages/ClientsPage';
 import ActivitiesPage from './pages/ActivitiesPage';
-import SchedulesPage from './pages/SchedulesPage';
 import ItinerariesPage from './pages/ItinerariesPage';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -18,7 +17,7 @@ const App = () => {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/clients" element={<ClientsPage />} />
             <Route path="/activities" element={<ActivitiesPage />} />
-            <Route path="/schedules" element={<SchedulesPage />} />
+            <Route path="/schedules" element={<Navigate to="/activities" replace />} />
             <Route path="/itineraries" element={<ItinerariesPage />} />
           </Route>
         </Route>

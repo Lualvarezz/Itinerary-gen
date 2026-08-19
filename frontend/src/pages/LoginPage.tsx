@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { saveToken } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -14,10 +15,31 @@ const LoginPage = () => {
     setError('');
 
     try {
+      // 1. Intentar autenticación vía Supabase Auth
+      const { data: supaData, error: supaError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (!supaError && supaData.session) {
+        saveToken(supaData.session.access_token);
+        localStorage.setItem(
+          'user',
+          JSON.stringify({
+            id: supaData.user.id,
+            email: supaData.user.email,
+            fullName: supaData.user.user_metadata?.full_name || 'Operador',
+          })
+        );
+        navigate('/itineraries');
+        return;
+      }
+
+      // 2. Fallback al backend API JWT
       const { data } = await api.post('/auth/login', { email, password });
       saveToken(data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      navigate('/dashboard');
+      navigate('/itineraries');
     } catch {
       setError('Credenciales inválidas. Intenta de nuevo.');
     }

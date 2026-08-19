@@ -40,4 +40,20 @@ export class CatalogService {
 
     return this.catalogRepository.createActivity(input);
   }
+
+  async updateActivity(id: number, input: {
+    name?: string;
+    description?: string | null;
+    price?: number;
+    durationMinutes?: number;
+    touristPlaceId?: number;
+    categoryId?: number;
+    imageUrl?: string | null;
+  }) {
+    return this.catalogRepository.updateActivity(id, input);
+  }
+
+  async deleteActivity(id: number) {
+    return this.catalogRepository.deleteActivity(id);
+  }
 }

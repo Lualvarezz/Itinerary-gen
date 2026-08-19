@@ -159,12 +159,30 @@ const ClientsPage = () => {
               <form onSubmit={handleSubmit} className="mt-6">
                 {message ? <p className="mb-4 text-sm text-emerald-400">{message}</p> : null}
                 <div className="grid gap-4 md:grid-cols-2">
-                  <input className="rounded-lg border border-slate-700 bg-slate-800 p-3" placeholder="Nombre completo" value={form.fullName} onChange={(event) => setForm({ ...form, fullName: event.target.value })} required />
-                  <input className="rounded-lg border border-slate-700 bg-slate-800 p-3" placeholder="Documento" value={form.documentNumber} onChange={(event) => setForm({ ...form, documentNumber: event.target.value })} required />
-                  <input className="rounded-lg border border-slate-700 bg-slate-800 p-3" placeholder="Correo" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} />
-                  <input className="rounded-lg border border-slate-700 bg-slate-800 p-3" placeholder="Teléfono" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} />
-                  <input className="rounded-lg border border-slate-700 bg-slate-800 p-3" placeholder="Nacionalidad" value={form.nationality} onChange={(event) => setForm({ ...form, nationality: event.target.value })} required />
-                  <input className="rounded-lg border border-slate-700 bg-slate-800 p-3" type="number" min="1" value={form.numberOfPeople} onChange={(event) => setForm({ ...form, numberOfPeople: Number(event.target.value) })} />
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-300">Nombre completo *</label>
+                    <input className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-sm" placeholder="Ej: María López" value={form.fullName} onChange={(event) => setForm({ ...form, fullName: event.target.value })} required />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-300">Número de documento *</label>
+                    <input className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-sm" placeholder="Ej: 1045123456" value={form.documentNumber} onChange={(event) => setForm({ ...form, documentNumber: event.target.value })} required />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-300">Correo electrónico</label>
+                    <input className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-sm" placeholder="correo@ejemplo.com" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-300">Teléfono</label>
+                    <input className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-sm" placeholder="+57 300 000 0000" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-300">Nacionalidad *</label>
+                    <input className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-sm" placeholder="Ej: Colombiana" value={form.nationality} onChange={(event) => setForm({ ...form, nationality: event.target.value })} required />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-300">Número de personas *</label>
+                    <input className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-sm" type="number" min="1" placeholder="Número de personas" value={form.numberOfPeople} onChange={(event) => setForm({ ...form, numberOfPeople: Number(event.target.value) })} required />
+                  </div>
                 </div>
                 <textarea className="mt-4 w-full rounded-lg border border-slate-700 bg-slate-800 p-3" placeholder="Observaciones" value={form.observations} onChange={(event) => setForm({ ...form, observations: event.target.value })} />
                 <div className="mt-6 flex justify-end gap-3">

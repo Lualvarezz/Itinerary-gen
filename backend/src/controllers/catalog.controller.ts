@@ -59,3 +59,21 @@ export const createActivity = async (req: Request, res: Response, next: NextFunc
     next(error);
   }
 };
+
+export const updateActivity = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const activity = await catalogService.updateActivity(Number(req.params.id), req.body);
+    res.status(200).json(activity);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteActivity = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await catalogService.deleteActivity(Number(req.params.id));
+    res.status(200).json({ message: 'Actividad eliminada correctamente' });
+  } catch (error) {
+    next(error);
+  }
+};
