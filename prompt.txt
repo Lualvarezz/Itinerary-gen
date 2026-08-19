@@ -1,0 +1,459 @@
+Actúa como un Arquitecto de Software Senior, Tech Lead Full Stack y Product Owner.
+
+Quiero desarrollar un MVP llamado:
+
+"Generador de Itinerarios Turísticos Personalizados"
+
+La solución será utilizada inicialmente por agencias de turismo de Cartagena (Colombia).
+
+Debe construirse con una arquitectura escalable y buenas prácticas.
+
+STACK TECNOLÓGICO
+
+Frontend:
+- React
+- Vite
+- TypeScript
+- TailwindCSS
+- React Router
+- React Hook Form
+- TanStack Query
+- Axios
+- React Hot Toast
+- Heroicons
+
+Backend:
+- Node.js
+- Express
+- TypeScript
+- Prisma ORM
+- JWT
+- Bcrypt
+- Zod para validaciones
+
+Base de datos:
+- Supabase PostgreSQL
+
+Autenticación:
+- JWT
+- Roles
+
+Generación de PDF:
+- PDFMake o Puppeteer
+
+Control de versiones:
+- Git
+
+Arquitectura:
+- Clean Architecture
+- Repository Pattern
+- MVC
+- SOLID
+
+================================
+
+DESCRIPCIÓN DEL NEGOCIO
+
+El sistema será utilizado únicamente por operadores turísticos.
+
+No será usado directamente por turistas.
+
+El operador registra un cliente.
+
+Luego crea un itinerario.
+
+Selecciona actividades.
+
+Selecciona fecha.
+
+Selecciona horario disponible.
+
+Agrega observaciones.
+
+Confirma que el cliente realizó el pago (el pago ocurre fuera del sistema).
+
+Finalmente el sistema genera automáticamente un PDF profesional con toda la información del viaje.
+
+================================
+
+OBJETIVO DEL MVP
+
+Reducir el tiempo que tarda un operador en construir un itinerario turístico.
+
+================================
+
+ROLES
+
+Administrador
+
+Puede:
+
+Administrar usuarios.
+
+Administrar actividades.
+
+Administrar horarios.
+
+Administrar lugares turísticos.
+
+Administrar categorías.
+
+Ver todos los itinerarios.
+
+Operador Turístico
+
+Puede:
+
+Crear clientes.
+
+Editar clientes.
+
+Buscar clientes.
+
+Crear itinerarios.
+
+Editar itinerarios.
+
+Generar PDF.
+
+Consultar historial.
+
+================================
+
+MÓDULOS
+
+1 Usuarios
+
+Login
+
+Cerrar sesión
+
+Perfil
+
+Cambiar contraseña
+
+2 Clientes
+
+CRUD
+
+Nombre
+
+Documento
+
+Correo
+
+Teléfono
+
+Nacionalidad
+
+Número de personas
+
+Observaciones
+
+3 Lugares turísticos
+
+CRUD
+
+Nombre
+
+Descripción
+
+Ciudad
+
+Ubicación
+
+Imagen principal
+
+Estado
+
+4 Actividades
+
+CRUD
+
+Nombre
+
+Descripción
+
+Precio
+
+Duración
+
+Lugar turístico
+
+Categoría
+
+Imagen
+
+Estado
+
+5 Horarios
+
+CRUD
+
+Actividad
+
+Fecha
+
+Hora inicio
+
+Hora fin
+
+Capacidad
+
+Disponibles
+
+Estado
+
+6 Itinerarios
+
+Cliente
+
+Operador
+
+Fecha creación
+
+Estado
+
+Observaciones
+
+Total
+
+7 Detalle del itinerario
+
+Actividad
+
+Horario
+
+Cantidad personas
+
+Precio
+
+Subtotal
+
+8 PDF
+
+Debe contener:
+
+Logo
+
+Información del cliente
+
+Información de la agencia
+
+Actividades
+
+Horarios
+
+Lugar de encuentro
+
+Duración
+
+Precio
+
+Imágenes
+
+Observaciones
+
+Total
+
+================================
+
+ESTADOS
+
+Cliente
+
+Activo
+
+Inactivo
+
+Actividad
+
+Disponible
+
+No disponible
+
+Horario
+
+Disponible
+
+Completo
+
+Cancelado
+
+Itinerario
+
+Borrador
+
+Pendiente
+
+Confirmado
+
+Cancelado
+
+Finalizado
+
+================================
+
+REGLAS DE NEGOCIO
+
+No se pueden asignar dos actividades al mismo horario.
+
+Un horario no puede sobrepasar la capacidad.
+
+No puede existir un itinerario sin cliente.
+
+No puede generarse PDF si el itinerario está incompleto.
+
+El operador solo puede editar itinerarios creados por él.
+
+Solo el administrador administra actividades.
+
+Las contraseñas deben almacenarse cifradas.
+
+Toda consulta debe paginarse.
+
+Implementar búsqueda.
+
+Implementar filtros.
+
+================================
+
+BASE DE DATOS
+
+Diseña una base de datos completamente normalizada.
+
+Crear todas las tablas.
+
+Crear claves primarias.
+
+Crear claves foráneas.
+
+Crear índices.
+
+Crear restricciones.
+
+Crear enums cuando sea necesario.
+
+Generar el script SQL completo para Supabase.
+
+================================
+
+BACKEND
+
+Crear:
+
+Arquitectura completa.
+
+Carpetas.
+
+Controladores.
+
+Servicios.
+
+Repositorios.
+
+Middlewares.
+
+Autenticación JWT.
+
+Autorización por Roles.
+
+Validaciones.
+
+Manejo de errores.
+
+Documentación Swagger.
+
+Crear todos los endpoints REST.
+
+================================
+
+FRONTEND
+
+Crear:
+
+Dashboard.
+
+Sidebar.
+
+Navbar.
+
+Login.
+
+CRUD Clientes.
+
+CRUD Actividades.
+
+CRUD Horarios.
+
+CRUD Itinerarios.
+
+Vista previa PDF.
+
+Diseño responsive.
+
+Tema moderno.
+
+Utilizar Tailwind.
+
+================================
+
+API
+
+Generar todas las rutas.
+
+Ejemplo:
+
+POST /login
+
+GET /clientes
+
+POST /clientes
+
+PUT /clientes/{id}
+
+DELETE /clientes/{id}
+
+GET /actividades
+
+POST /itinerarios
+
+POST /pdf
+
+etc.
+
+================================
+
+ENTREGABLES
+
+Quiero que desarrolles el proyecto paso a paso.
+
+Orden:
+
+1.
+Modelo Entidad Relación.
+
+2.
+SQL completo para Supabase.
+
+3.
+Diagrama de arquitectura.
+
+4.
+Backend completo.
+
+5.
+Frontend completo.
+
+6.
+Documentación.
+
+7.
+Docker.
+
+8.
+README.
+
+No omitas ningún archivo.
+
+Genera un proyecto profesional listo para producción.

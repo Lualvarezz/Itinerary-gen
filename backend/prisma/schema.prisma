@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  fullName     String   @map("full_name")
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         String   @default("operator")
+  phone        String?
+  status       String   @default("active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  createdClients Client[]
+  createdActivities Activity[]
+  createdSchedules Schedule[]
+  operatedItineraries Itinerary[]
+
+  @@map("users")
+}
+
+model AgencyProfile {
+  id        Int      @id @default(autoincrement())
+  name      String
+  logoUrl   String?  @map("logo_url")
+  address   String?
+  city      String   @default("Cartagena")
+  phone     String?
+  email     String?
+  nit       String?  @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("agency_profiles")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  status      String   @default("active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  activities  Activity[]
+
+  @@map("categories")
+}
+
+model TouristPlace {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  city        String
+  location    String?
+  imageUrl    String?  @map("image_url")
+  status      String   @default("active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  activities  Activity[]
+
+  @@map("tourist_places")
+}
+
+model Activity {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  description        String?
+  price              Decimal  @db.Decimal(10, 2)
+  durationMinutes    Int      @map("duration_minutes")
+  touristPlaceId     Int      @map("tourist_place_id")
+  categoryId         Int      @map("category_id")
+  imageUrl           String?  @map("image_url")
+  status             String   @default("available")
+  createdByUserId    String   @map("created_by_user_id")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  touristPlace       TouristPlace @relation(fields: [touristPlaceId], references: [id])
+  category           Category     @relation(fields: [categoryId], references: [id])
+  createdBy          User         @relation(fields: [createdByUserId], references: [id])
+  schedules          Schedule[]
+  itineraryItems     ItineraryItem[]
+
+  @@map("activities")
+}
+
+model Client {
+  id                Int      @id @default(autoincrement())
+  fullName          String   @map("full_name")
+  documentNumber    String   @unique @map("document_number")
+  email             String?
+  phone             String?
+  nationality       String
+  numberOfPeople    Int      @default(1) @map("number_of_people")
+  observations      String?
+  status            String   @default("active")
+  createdByUserId   String   @map("created_by_user_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  createdBy         User        @relation(fields: [createdByUserId], references: [id])
+  itineraries       Itinerary[]
+
+  @@map("clients")
+}
+
+model Schedule {
+  id               Int      @id @default(autoincrement())
+  activityId       Int      @map("activity_id")
+  scheduleDate     DateTime @map("schedule_date") @db.Date
+  startTime        DateTime @map("start_time") @db.Time(0)
+  endTime          DateTime @map("end_time") @db.Time(0)
+  capacity         Int
+  availableSlots   Int      @default(0) @map("available_slots")
+  status           String   @default("available")
+  createdByUserId  String   @map("created_by_user_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  activity         Activity @relation(fields: [activityId], references: [id])
+  createdBy        User     @relation(fields: [createdByUserId], references: [id])
+  itineraryItems   ItineraryItem[]
+
+  @@map("schedules")
+}
+
+model Itinerary {
+  id             Int      @id @default(autoincrement())
+  clientId       Int      @map("client_id")
+  operatorUserId String   @map("operator_user_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  status         String   @default("draft")
+  observations   String?
+  totalAmount    Decimal  @default(0) @map("total_amount") @db.Decimal(12, 2)
+  isComplete     Boolean  @default(false) @map("is_complete")
+  completedAt    DateTime? @map("completed_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  client         Client @relation(fields: [clientId], references: [id])
+  operator       User   @relation(fields: [operatorUserId], references: [id])
+  items          ItineraryItem[]
+
+  @@map("itineraries")
+}
+
+model ItineraryItem {
+  id             Int      @id @default(autoincrement())
+  itineraryId    Int      @map("itinerary_id")
+  activityId     Int      @map("activity_id")
+  scheduleId     Int      @map("schedule_id")
+  quantityPeople Int      @map("quantity_people")
+  unitPrice      Decimal  @map("unit_price") @db.Decimal(10, 2)
+  subtotal       Decimal  @db.Decimal(10, 2)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  itinerary      Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  activity       Activity  @relation(fields: [activityId], references: [id])
+  schedule       Schedule  @relation(fields: [scheduleId], references: [id])
+
+  @@unique([itineraryId, scheduleId], name: "itinerary_schedule_unique")
+  @@map("itinerary_items")
+}
