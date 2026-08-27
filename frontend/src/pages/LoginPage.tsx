@@ -46,17 +46,29 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
-        <h2 className="text-2xl font-semibold text-white">Iniciar sesión</h2>
-        <p className="mt-2 text-sm text-slate-400">Accede al panel de operadores turísticos.</p>
-        <p className="mt-2 text-xs text-slate-500">Acceso directo: carmenalvarezmar@gmail.com / 12345678</p>
+    <div className="flex min-h-screen items-center justify-center bg-[#F6F8FC] px-4 font-sans">
+      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4361EE] text-white font-bold text-lg shadow-sm">
+            CT
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 leading-tight">Cartagena Tours</h2>
+            <p className="text-xs text-slate-500 font-medium">Generador de Itinerarios</p>
+          </div>
+        </div>
+
+        <h3 className="text-2xl font-bold text-slate-900">Iniciar sesión</h3>
+        <p className="mt-1 text-sm text-slate-500">Accede al panel de operadores turísticos.</p>
+        <p className="mt-2 rounded-lg bg-slate-50 border border-slate-200 p-2 text-xs text-slate-600">
+          <span className="font-semibold">Acceso directo:</span> carmenalvarezmar@gmail.com / 12345678
+        </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="mb-2 block text-sm text-slate-300">Correo</label>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-700">Correo electrónico</label>
             <input
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none"
+              className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#4361EE] focus:ring-2 focus:ring-[#4361EE]/20"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -64,19 +76,19 @@ const LoginPage = () => {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm text-slate-300">Contraseña</label>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-700">Contraseña</label>
             <input
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none"
+              className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#4361EE] focus:ring-2 focus:ring-[#4361EE]/20"
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
             />
           </div>
 
-          {error ? <p className="text-sm text-rose-400">{error}</p> : null}
+          {error ? <p className="rounded-lg bg-rose-50 border border-rose-200 p-2.5 text-xs font-medium text-rose-600">{error}</p> : null}
 
-          <button className="w-full rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-white transition hover:bg-emerald-400">
-            Entrar
+          <button className="w-full rounded-xl bg-[#4361EE] py-2.5 text-sm font-bold text-white shadow-md shadow-[#4361EE]/20 transition hover:bg-[#3730A3]">
+            Entrar al sistema
           </button>
         </form>
       </div>

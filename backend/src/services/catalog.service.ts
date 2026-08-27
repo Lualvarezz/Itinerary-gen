@@ -1,5 +1,6 @@
 import { HttpError } from '../utils/httpError.js';
 import { CatalogRepository } from '../repositories/catalog.repository.js';
+import { createActivitySchema, updateActivitySchema } from '../schemas/catalog.schema.js';
 
 export class CatalogService {
   constructor(private readonly catalogRepository = new CatalogRepository()) {}
@@ -34,11 +35,16 @@ export class CatalogService {
     imageUrl?: string | null;
     createdByUserId: string;
   }) {
-    if (!input.touristPlaceId || !input.categoryId) {
-      throw new HttpError(400, 'Lugar turístico y categoría son obligatorios');
+    const validated = createActivitySchema.safeParse(input);
+    if (!validated.success) {
+      const firstError = validated.error.errors[0]?.message || 'Datos de actividad inválidos';
+      throw new HttpError(400, firstError);
     }
 
-    return this.catalogRepository.createActivity(input);
+    return this.catalogRepository.createActivity({
+      ...validated.data,
+      createdByUserId: input.createdByUserId || 'system',
+    });
   }
 
   async updateActivity(id: number, input: {
@@ -50,7 +56,13 @@ export class CatalogService {
     categoryId?: number;
     imageUrl?: string | null;
   }) {
-    return this.catalogRepository.updateActivity(id, input);
+    const validated = updateActivitySchema.safeParse(input);
+    if (!validated.success) {
+      const firstError = validated.error.errors[0]?.message || 'Datos de actividad inválidos';
+      throw new HttpError(400, firstError);
+    }
+
+    return this.catalogRepository.updateActivity(id, validated.data);
   }
 
   async deleteActivity(id: number) {

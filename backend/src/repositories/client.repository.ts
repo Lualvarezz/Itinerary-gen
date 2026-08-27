@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma.js';
+import { getValidUserId } from '../utils/userHelper.js';
 
 export class ClientRepository {
   async list() {
@@ -47,7 +48,13 @@ export class ClientRepository {
     observations?: string | null;
     createdByUserId: string;
   }) {
-    return prisma.client.create({ data });
+    const validUserId = await getValidUserId(data.createdByUserId);
+    return prisma.client.create({
+      data: {
+        ...data,
+        createdByUserId: validUserId,
+      },
+    });
   }
 
   async findById(id: number) {

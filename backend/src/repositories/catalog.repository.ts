@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma.js';
+import { getValidUserId } from '../utils/userHelper.js';
 
 export class CatalogRepository {
   async listCategories() {
@@ -38,12 +39,20 @@ export class CatalogRepository {
     touristPlaceId: number;
     categoryId: number;
     imageUrl?: string | null;
-    createdByUserId: string;
+    createdByUserId?: string;
   }) {
+    const validUserId = await getValidUserId(data.createdByUserId);
+
     return prisma.activity.create({
       data: {
-        ...data,
+        name: data.name,
+        description: data.description || null,
         price: data.price,
+        durationMinutes: Number(data.durationMinutes),
+        touristPlaceId: Number(data.touristPlaceId),
+        categoryId: Number(data.categoryId),
+        imageUrl: data.imageUrl || null,
+        createdByUserId: validUserId,
       },
       include: { category: true, touristPlace: true, schedules: true },
     });

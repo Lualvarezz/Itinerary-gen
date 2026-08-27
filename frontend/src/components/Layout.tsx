@@ -18,37 +18,58 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-950 text-white">
-      <aside className="w-72 border-r border-slate-800 bg-slate-900 p-6">
+    <div className="flex min-h-screen bg-[#F6F8FC] text-slate-900">
+      <aside className="w-72 border-r border-slate-200 bg-white p-6 flex flex-col justify-between shadow-xs">
         <div>
-          <h2 className="text-xl font-semibold">Cartagena Tours</h2>
-          <p className="mt-1 text-sm text-slate-400">Panel de operador</p>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4361EE] text-white font-bold text-lg shadow-sm">
+              CT
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-slate-900 leading-tight">Cartagena Tours</h2>
+              <p className="text-xs text-slate-500 font-medium">Generador de Itinerarios</p>
+            </div>
+          </div>
+
+          <nav className="mt-8 space-y-1.5">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex items-center rounded-xl px-4 py-2.5 text-sm transition font-medium ${
+                    isActive
+                      ? 'bg-[#4361EE] text-white font-semibold shadow-sm shadow-[#4361EE]/20'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
         </div>
 
-        <nav className="mt-8 space-y-2">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `block rounded-lg px-4 py-3 text-sm transition ${isActive ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:bg-slate-800'}`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-800/70 p-4">
-          <p className="text-sm font-semibold">{user?.fullName || 'Operador'}</p>
-          <p className="text-xs text-slate-400">{user?.email || 'Sin sesión'}</p>
-          <button onClick={handleLogout} className="mt-4 w-full rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-700">
+        <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#EEF2FF] text-[#4361EE] font-bold text-xs">
+              {(user?.fullName || 'OP').slice(0, 2).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-bold text-slate-900">{user?.fullName || 'Operador'}</p>
+              <p className="truncate text-[11px] text-slate-500">{user?.email || 'Sin sesión'}</p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="mt-3 w-full rounded-xl border border-slate-200 bg-white py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-100 hover:text-slate-900 transition"
+          >
             Cerrar sesión
           </button>
         </div>
       </aside>
 
-      <main className="flex-1">
+      <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
     </div>

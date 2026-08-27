@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma.js';
+import { getValidUserId } from '../utils/userHelper.js';
 
 export class ItineraryRepository {
   async list() {
@@ -46,6 +47,7 @@ export class ItineraryRepository {
       subtotal: number;
     }>;
   }) {
+    const validOperatorId = await getValidUserId(data.operatorUserId);
     return prisma.$transaction(async (tx) => {
       const normalizedStatus = data.status === 'confirmed' ? 'confirmed' : 'draft';
       const items = data.items || [];
@@ -79,7 +81,7 @@ export class ItineraryRepository {
       const createdItinerary = await tx.itinerary.create({
         data: {
           clientId: data.clientId,
-          operatorUserId: data.operatorUserId,
+          operatorUserId: validOperatorId,
           observations: data.observations ?? null,
           status: normalizedStatus,
           totalAmount,
@@ -316,6 +318,7 @@ export class ItineraryRepository {
     capacity: number;
     createdByUserId: string;
   }) {
+    const validUserId = await getValidUserId(data.createdByUserId);
     const formattedStartTime = data.startTime.includes(':') && data.startTime.split(':').length === 2 ? `${data.startTime}:00` : data.startTime;
     const formattedEndTime = data.endTime.includes(':') && data.endTime.split(':').length === 2 ? `${data.endTime}:00` : data.endTime;
 
@@ -328,7 +331,7 @@ export class ItineraryRepository {
         capacity: Number(data.capacity),
         availableSlots: Number(data.capacity),
         status: 'available',
-        createdByUserId: data.createdByUserId,
+        createdByUserId: validUserId,
       },
     });
   }

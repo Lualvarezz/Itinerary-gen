@@ -349,31 +349,31 @@ const ItinerariesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-8 text-white">
+    <div className="min-h-screen bg-[#F6F8FC] p-8 text-slate-900 font-sans">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Itinerarios de Viaje</h1>
-            <p className="mt-1 text-sm text-slate-400">
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Itinerarios de Viaje</h1>
+            <p className="mt-1 text-sm text-slate-500">
               Genera propuestas personalizadas, asigna actividades con horarios y emite el PDF oficial confirmado.
             </p>
           </div>
           <button
-            className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400"
+            className="rounded-xl bg-[#4361EE] px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-[#3730A3]"
             onClick={openCreateModal}
           >
             + Crear Itinerario
           </button>
         </div>
 
-        {message ? <p className="mt-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 p-3.5 text-sm text-emerald-400">{message}</p> : null}
-        {errorMessage ? <p className="mt-4 rounded-lg bg-rose-500/10 border border-rose-500/30 p-3.5 text-sm text-rose-400">{errorMessage}</p> : null}
+        {message ? <p className="mt-4 rounded-xl bg-emerald-50 border border-emerald-200 p-3.5 text-sm font-medium text-emerald-700">{message}</p> : null}
+        {errorMessage ? <p className="mt-4 rounded-xl bg-rose-50 border border-rose-200 p-3.5 text-sm font-medium text-rose-700">{errorMessage}</p> : null}
 
         {/* LISTADO DE ITINERARIOS */}
         <div className="mt-8 space-y-4">
           {itineraries.length === 0 ? (
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
-              <p className="text-lg font-medium text-slate-300">No hay itinerarios registrados aún.</p>
+            <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500 shadow-xs">
+              <p className="text-lg font-bold text-slate-800">No hay itinerarios registrados aún.</p>
               <p className="text-sm text-slate-500 mt-1">Haz clic en "+ Crear Itinerario" para construir la primera propuesta turística.</p>
             </div>
           ) : (
@@ -381,71 +381,71 @@ const ItinerariesPage = () => {
               const isConfirmed = itinerary.status === 'confirmed';
 
               return (
-                <div key={itinerary.id} className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div key={itinerary.id} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition hover:shadow-md">
+                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
                     <div>
                       <div className="flex items-center gap-3">
-                        <h3 className="text-xl font-bold text-white">
+                        <h3 className="text-xl font-bold text-slate-900">
                           {itinerary.client?.fullName || 'Cliente sin nombre'}
                         </h3>
                         <span
                           className={`rounded-full px-3 py-0.5 text-xs font-semibold ${
                             isConfirmed
-                              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                              : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-amber-50 text-amber-700 border border-amber-200'
                           }`}
                         >
                           {isConfirmed ? '✓ CONFIRMADO' : '✎ BORRADOR (Editable)'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-1">
+                      <p className="text-xs text-slate-500 mt-1">
                         Doc: {itinerary.client?.documentNumber || 'N/A'} · Tel: {itinerary.client?.phone || 'N/A'} · Creado: {formatDateDisplay(itinerary.createdAt)}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-slate-400">Total del Itinerario</p>
-                      <p className="text-2xl font-black text-emerald-400">
+                      <p className="text-xs font-medium text-slate-500">Total del Itinerario</p>
+                      <p className="text-2xl font-black text-[#4361EE]">
                         ${Number(itinerary.totalAmount || 0).toLocaleString('es-CO', { minimumFractionDigits: 2 })}
                       </p>
                     </div>
                   </div>
 
                   {itinerary.observations ? (
-                    <p className="mt-3 text-xs text-slate-400 italic">
+                    <p className="mt-3 text-xs text-slate-600 italic bg-slate-50 p-2.5 rounded-lg border border-slate-100">
                       Notas: "{itinerary.observations}"
                     </p>
                   ) : null}
 
                   {/* Detalle de actividades incluidas */}
                   <div className="mt-4 space-y-2">
-                    <p className="text-xs font-semibold text-slate-400">Actividades programadas ({itinerary.items?.length || 0}):</p>
+                    <p className="text-xs font-bold text-slate-700">Actividades programadas ({itinerary.items?.length || 0}):</p>
                     {(itinerary.items || []).map((item) => (
-                      <div key={item.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-800/80 bg-slate-800/50 p-3 text-xs">
+                      <div key={item.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50/70 p-3 text-xs">
                         <div>
-                          <p className="font-semibold text-white">{item.activity?.name || 'Actividad'}</p>
-                          <p className="text-slate-400 text-[11px] mt-0.5">
+                          <p className="font-semibold text-slate-900">{item.activity?.name || 'Actividad'}</p>
+                          <p className="text-slate-500 text-[11px] mt-0.5">
                             📅 {formatDateDisplay(item.schedule?.scheduleDate)} · ⏰ {formatTimeDisplay(item.schedule?.startTime)} - {formatTimeDisplay(item.schedule?.endTime)}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium text-emerald-400">{item.quantityPeople} persona(s) x ${Number(item.unitPrice).toFixed(2)}</p>
-                          <p className="text-slate-300 font-bold">Subtotal: ${Number(item.subtotal).toFixed(2)}</p>
+                          <p className="font-medium text-[#4361EE]">{item.quantityPeople} persona(s) x ${Number(item.unitPrice).toFixed(2)}</p>
+                          <p className="text-slate-800 font-bold">Subtotal: ${Number(item.subtotal).toFixed(2)}</p>
                         </div>
                       </div>
                     ))}
                   </div>
 
                   {/* Acciones */}
-                  <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/80 pt-4">
+                  <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
                     <div className="flex gap-2">
                       <button
-                        className="rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-medium text-slate-200 hover:bg-slate-700 transition"
+                        className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition"
                         onClick={() => openEditModal(itinerary)}
                       >
                         ✏️ Editar Itinerario
                       </button>
                       <button
-                        className="rounded-lg border border-rose-700/40 bg-rose-500/10 px-3.5 py-2 text-xs font-medium text-rose-400 hover:bg-rose-500/20 transition"
+                        className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition"
                         onClick={() => handleDeleteItinerary(itinerary.id)}
                       >
                         🗑️ Eliminar
@@ -453,7 +453,7 @@ const ItinerariesPage = () => {
                     </div>
 
                     <button
-                      className="rounded-xl bg-emerald-500 px-5 py-2 text-xs font-bold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400 flex items-center gap-2"
+                      className="rounded-xl bg-[#4361EE] px-5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#3730A3] transition flex items-center gap-2"
                       onClick={() => handleGeneratePdfAndConfirm(itinerary.id)}
                       disabled={isGeneratingPdf === itinerary.id}
                     >
@@ -468,36 +468,36 @@ const ItinerariesPage = () => {
 
         {/* MODAL ÚNICO: FORMULARIO INTEGRADO DE CREACIÓN / EDICIÓN */}
         {isModalOpen ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xs">
-            <div className="w-full max-w-4xl rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-2xs">
+            <div className="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
-                  <h3 className="text-xl font-bold text-white">
+                  <h3 className="text-xl font-bold text-slate-900">
                     {editingItineraryId ? `Editar Itinerario #${editingItineraryId}` : 'Crear Nuevo Itinerario'}
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-500 mt-1">
                     Selecciona al cliente y agrega las actividades con sus horarios disponibles en un solo flujo.
                   </p>
                 </div>
                 <button
-                  className="rounded-lg border border-slate-700 px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-800 transition"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
                   onClick={() => setIsModalOpen(false)}
                 >
                   Cerrar
                 </button>
               </div>
 
-              {errorMessage ? <p className="mt-4 rounded-lg bg-rose-500/10 border border-rose-500/30 p-3 text-xs text-rose-400">{errorMessage}</p> : null}
+              {errorMessage ? <p className="mt-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs font-medium text-rose-700">{errorMessage}</p> : null}
 
               <div className="mt-6 space-y-6">
                 {/* SECCIÓN 1: CLIENTE */}
-                <div className="rounded-xl border border-slate-800 bg-slate-800/40 p-4">
-                  <h4 className="text-sm font-semibold text-white mb-3">1. Datos del Cliente</h4>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
+                  <h4 className="text-sm font-bold text-slate-900 mb-3">1. Datos del Cliente</h4>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-300">Cliente *</label>
+                      <label className="mb-1 block text-xs font-semibold text-slate-700">Cliente *</label>
                       <select
-                        className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-sm text-white outline-none focus:border-emerald-500"
+                        className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-[#4361EE] focus:ring-2 focus:ring-[#4361EE]/20"
                         value={clientId}
                         onChange={(e) => handleClientChange(e.target.value)}
                         required
@@ -512,9 +512,9 @@ const ItinerariesPage = () => {
                     </div>
 
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-300">Observaciones generales</label>
+                      <label className="mb-1 block text-xs font-semibold text-slate-700">Observaciones generales</label>
                       <input
-                        className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-sm text-white outline-none focus:border-emerald-500"
+                        className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#4361EE] focus:ring-2 focus:ring-[#4361EE]/20"
                         placeholder="Ej: Turistas de España, hotel en Bocagrande, vuelo de regreso el domingo"
                         value={observations}
                         onChange={(e) => setObservations(e.target.value)}
@@ -523,27 +523,27 @@ const ItinerariesPage = () => {
                   </div>
 
                   {selectedClient ? (
-                    <div className="mt-3 flex flex-wrap gap-4 rounded-lg border border-slate-700/60 bg-slate-800/60 p-2.5 text-xs text-slate-300">
-                      <span>👤 <strong>{selectedClient.fullName}</strong></span>
-                      <span>📄 Doc: <strong>{selectedClient.documentNumber}</strong></span>
-                      <span>🌎 Nacionalidad: <strong>{selectedClient.nationality}</strong></span>
-                      <span>👥 Personas base: <strong>{selectedClient.numberOfPeople}</strong></span>
+                    <div className="mt-3 flex flex-wrap gap-4 rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-700 font-medium">
+                      <span>👤 <strong className="text-slate-900">{selectedClient.fullName}</strong></span>
+                      <span>📄 Doc: <strong className="text-slate-900">{selectedClient.documentNumber}</strong></span>
+                      <span>🌎 Nacionalidad: <strong className="text-slate-900">{selectedClient.nationality}</strong></span>
+                      <span>👥 Personas base: <strong className="text-slate-900">{selectedClient.numberOfPeople}</strong></span>
                     </div>
                   ) : null}
                 </div>
 
                 {/* SECCIÓN 2: ACTIVIDADES A REALIZAR */}
-                <div className="rounded-xl border border-slate-800 bg-slate-800/40 p-4">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <h4 className="text-sm font-semibold text-white">2. Actividades y Horarios a Realizar</h4>
-                      <p className="text-[11px] text-slate-400">
+                      <h4 className="text-sm font-bold text-slate-900">2. Actividades y Horarios a Realizar</h4>
+                      <p className="text-[11px] text-slate-500">
                         Los cupos se reservan automáticamente de los turnos disponibles de cada actividad.
                       </p>
                     </div>
                     <button
                       type="button"
-                      className="rounded-lg bg-slate-800 border border-slate-700 px-3 py-1.5 text-xs font-semibold text-emerald-400 hover:bg-slate-700 transition"
+                      className="rounded-xl bg-[#EEF2FF] border border-[#4361EE]/30 px-3.5 py-1.5 text-xs font-semibold text-[#4361EE] hover:bg-[#E0E7FF] transition"
                       onClick={handleAddActivityRow}
                     >
                       + Agregar otra actividad
@@ -555,13 +555,13 @@ const ItinerariesPage = () => {
                       const itemSchedules = schedules.filter((s) => Number(s.activityId) === Number(item.activityId));
 
                       return (
-                        <div key={index} className="rounded-xl border border-slate-700 bg-slate-800/80 p-3.5 space-y-3">
+                        <div key={index} className="rounded-xl border border-slate-200 bg-white p-4 space-y-3 shadow-2xs">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-slate-300">Actividad #{index + 1}</span>
+                            <span className="text-xs font-bold text-slate-800">Actividad #{index + 1}</span>
                             {selectedItems.length > 1 ? (
                               <button
                                 type="button"
-                                className="text-xs text-rose-400 hover:text-rose-300"
+                                className="text-xs font-semibold text-rose-600 hover:text-rose-700"
                                 onClick={() => handleRemoveActivityRow(index)}
                               >
                                 Quitar actividad ✕
@@ -572,9 +572,9 @@ const ItinerariesPage = () => {
                           <div className="grid gap-3 md:grid-cols-12">
                             {/* Selector de actividad */}
                             <div className="md:col-span-4">
-                              <label className="mb-1 block text-xs font-medium text-slate-300">Actividad *</label>
+                              <label className="mb-1 block text-xs font-semibold text-slate-700">Actividad *</label>
                               <select
-                                className="w-full rounded-lg border border-slate-700 bg-slate-900 p-2.5 text-xs text-white outline-none focus:border-emerald-500"
+                                className="w-full rounded-xl border border-slate-200 bg-white p-2.5 text-xs text-slate-900 outline-none transition focus:border-[#4361EE] focus:ring-2 focus:ring-[#4361EE]/20"
                                 value={item.activityId}
                                 onChange={(e) => handleItemActivityChange(index, e.target.value)}
                                 required
@@ -590,9 +590,9 @@ const ItinerariesPage = () => {
 
                             {/* Selector de horario disponible */}
                             <div className="md:col-span-4">
-                              <label className="mb-1 block text-xs font-medium text-slate-300">Horario Disponible *</label>
+                              <label className="mb-1 block text-xs font-semibold text-slate-700">Horario Disponible *</label>
                               <select
-                                className="w-full rounded-lg border border-slate-700 bg-slate-900 p-2.5 text-xs text-white outline-none focus:border-emerald-500"
+                                className="w-full rounded-xl border border-slate-200 bg-white p-2.5 text-xs text-slate-900 outline-none transition focus:border-[#4361EE] focus:ring-2 focus:ring-[#4361EE]/20"
                                 value={item.scheduleId}
                                 onChange={(e) => handleItemScheduleChange(index, e.target.value)}
                                 disabled={!item.activityId}
@@ -612,9 +612,9 @@ const ItinerariesPage = () => {
 
                             {/* Personas */}
                             <div className="md:col-span-2">
-                              <label className="mb-1 block text-xs font-medium text-slate-300">Personas *</label>
+                              <label className="mb-1 block text-xs font-semibold text-slate-700">Personas *</label>
                               <input
-                                className="w-full rounded-lg border border-slate-700 bg-slate-900 p-2.5 text-xs text-white outline-none focus:border-emerald-500"
+                                className="w-full rounded-xl border border-slate-200 bg-white p-2.5 text-xs text-slate-900 outline-none transition focus:border-[#4361EE] focus:ring-2 focus:ring-[#4361EE]/20"
                                 type="number"
                                 min="1"
                                 value={item.quantityPeople}
@@ -625,8 +625,8 @@ const ItinerariesPage = () => {
 
                             {/* Subtotal */}
                             <div className="md:col-span-2 text-right">
-                              <label className="mb-1 block text-xs font-medium text-slate-300">Subtotal</label>
-                              <p className="mt-2 text-sm font-bold text-emerald-400">
+                              <label className="mb-1 block text-xs font-semibold text-slate-700">Subtotal</label>
+                              <p className="mt-2 text-sm font-bold text-[#4361EE]">
                                 ${Number(item.subtotal).toFixed(2)}
                               </p>
                             </div>
@@ -637,19 +637,19 @@ const ItinerariesPage = () => {
                   </div>
 
                   {/* Resumen Total */}
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-700 pt-3">
-                    <span className="text-xs font-semibold text-slate-300">Total a Pagar del Itinerario:</span>
-                    <span className="text-xl font-black text-emerald-400">
+                  <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-3">
+                    <span className="text-xs font-bold text-slate-700">Total a Pagar del Itinerario:</span>
+                    <span className="text-xl font-black text-[#4361EE]">
                       ${calculateTotalAmount().toLocaleString('es-CO', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>
 
                 {/* BOTONES DE ACCIÓN UNIFICADOS */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
                   <button
                     type="button"
-                    className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 transition"
+                    className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
                     onClick={() => setIsModalOpen(false)}
                   >
                     Cancelar
@@ -658,7 +658,7 @@ const ItinerariesPage = () => {
                   <div className="flex gap-3">
                     <button
                       type="button"
-                      className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-5 py-2.5 text-sm font-semibold text-amber-400 hover:bg-amber-500/20 transition"
+                      className="rounded-xl border border-amber-300 bg-amber-50 px-5 py-2.5 text-sm font-bold text-amber-800 hover:bg-amber-100 transition"
                       onClick={handleSaveAsDraft}
                     >
                       💾 Guardar como Borrador
@@ -666,7 +666,7 @@ const ItinerariesPage = () => {
 
                     <button
                       type="button"
-                      className="rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 transition flex items-center gap-2"
+                      className="rounded-xl bg-[#4361EE] px-5 py-2.5 text-sm font-bold text-white shadow-xs hover:bg-[#3730A3] transition flex items-center gap-2"
                       onClick={() => handleGeneratePdfAndConfirm()}
                       disabled={isGeneratingPdf !== null}
                     >
