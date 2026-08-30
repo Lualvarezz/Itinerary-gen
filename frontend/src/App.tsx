@@ -4,6 +4,7 @@ import DashboardPage from './pages/DashboardPage';
 import ClientsPage from './pages/ClientsPage';
 import ActivitiesPage from './pages/ActivitiesPage';
 import ItinerariesPage from './pages/ItinerariesPage';
+import PublicItineraryPage from './pages/PublicItineraryPage';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -12,6 +13,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/itinerary/:publicToken" element={<PublicItineraryPage />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
@@ -19,7 +21,6 @@ const App = () => {
             <Route path="/activities" element={<ActivitiesPage />} />
             <Route path="/schedules" element={<Navigate to="/activities" replace />} />
             <Route path="/itineraries" element={<ItinerariesPage />} />
-        <Route path="/itinerary/:publicToken" element={<PublicItineraryPage />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
