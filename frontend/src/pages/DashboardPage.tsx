@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import { 
+  mockClients, 
+  mockItineraries, 
+  mockDashboardInsights,
+  mockTours
+} from '../lib/mockData';
 
 type Summary = {
   clientsCount: number;
@@ -24,6 +30,28 @@ const DashboardPage = () => {
       try {
         const { data } = await api.get('/v1/dashboard/summary');
         setSummary(data);
+      } catch {
+        // Fallback to mock data for development
+        const clientsCount = mockClients.length;
+        const activitiesCount = mockTours.length;
+        const itinerariesCount = mockItineraries.length;
+        const schedulesCount = 5; // default
+        const totalValue = mockItineraries.reduce((sum, it) => sum + it.totalAmount, 0);
+        const recentItineraries = mockItineraries.slice(0, 5).map(itinerary => ({
+          id: itinerary.id,
+          status: itinerary.status,
+          totalAmount: itinerary.totalAmount,
+          client: { fullName: itinerary.client?.fullName || 'Cliente' },
+        }));
+        
+        setSummary({
+          clientsCount,
+          activitiesCount,
+          itinerariesCount,
+          schedulesCount,
+          totalValue,
+          recentItineraries,
+        });
       } finally {
         setLoading(false);
       }

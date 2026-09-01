@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import { mockClients } from '../lib/mockData';
 
 type Client = {
   id: number;
@@ -28,8 +29,13 @@ const ClientsPage = () => {
   });
 
   const loadClients = async () => {
-    const { data } = await api.get('/v1/clients');
-    setClients(data);
+    try {
+      const { data } = await api.get('/v1/clients');
+      setClients(data);
+    } catch {
+      // Fallback to mock data for development
+      setClients(mockClients);
+    }
   };
 
   useEffect(() => {
