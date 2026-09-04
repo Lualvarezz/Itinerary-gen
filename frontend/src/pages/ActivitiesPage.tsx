@@ -108,8 +108,8 @@ const ActivitiesPage = () => {
           await api.post('/v1/catalog/categories', { name: 'Cultura e Historia', description: 'Museos y monumentos' });
           const refreshedCats = await api.get('/v1/catalog/categories');
           cats = refreshedCats.data;
-        } catch {
-          // ignore
+        } catch (error) {
+          console.error('Error seeding categories:', error);
         }
       }
 
@@ -120,8 +120,8 @@ const ActivitiesPage = () => {
           await api.post('/v1/catalog/tourist-places', { name: 'Castillo de San Felipe', city: 'Cartagena' });
           const refreshedPls = await api.get('/v1/catalog/tourist-places');
           pls = refreshedPls.data;
-        } catch {
-          // ignore
+        } catch (error) {
+          console.error('Error seeding tourist places:', error);
         }
       }
 
@@ -129,8 +129,8 @@ const ActivitiesPage = () => {
       setCategories(cats);
       setPlaces(pls);
       setSchedules(schedulesResponse.data);
-    } catch {
-      // fallback
+    } catch (error) {
+      console.error('Error loading activities data:', error);
     }
   };
 

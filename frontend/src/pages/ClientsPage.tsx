@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
-import { mockClients } from '../lib/mockData';
+import { mockClients, mockHotels } from '../lib/mockData';
+
+type Hotel = {
+  id: number;
+  name: string;
+  address?: string | null;
+  zone?: string | null;
+  sector?: string | null;
+};
 
 type Client = {
   id: number;
@@ -10,10 +18,15 @@ type Client = {
   phone?: string | null;
   nationality: string;
   numberOfPeople: number;
+  observations?: string | null;
+  hotelId?: number | null;
+  roomNumber?: string | null;
+  hotel?: Hotel | null;
 };
 
 const ClientsPage = () => {
   const [clients, setClients] = useState<Client[]>([]);
+  const [hotels, setHotels] = useState<Hotel[]>([]);
   const [search, setSearch] = useState('');
   const [message, setMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,20 +39,39 @@ const ClientsPage = () => {
     nationality: '',
     numberOfPeople: 1,
     observations: '',
+    hotelId: '' as number | string,
+    roomNumber: '',
   });
+
+  const loadHotels = async () => {
+    try {
+      const { data } = await api.get('/v1/hotels');
+      setHotels(data && data.length > 0 ? data : mockHotels);
+    } catch {
+      try {
+        const { data } = await api.get('/v1/catalog/hotels');
+        setHotels(data && data.length > 0 ? data : mockHotels);
+      } catch {
+        setHotels(mockHotels);
+      }
+    }
+  };
 
   const loadClients = async () => {
     try {
       const { data } = await api.get('/v1/clients');
       setClients(data);
     } catch {
-      // Fallback to mock data for development
-      setClients(mockClients);
+      setClients(mockClients.map((c) => ({
+        ...c,
+        hotel: mockHotels.find((h) => h.id === c.hotelId) || null,
+      })));
     }
   };
 
   useEffect(() => {
     loadClients();
+    loadHotels();
   }, []);
 
   const resetForm = () => {
@@ -52,6 +84,8 @@ const ClientsPage = () => {
       nationality: '',
       numberOfPeople: 1,
       observations: '',
+      hotelId: '',
+      roomNumber: '',
     });
   };
 
@@ -69,7 +103,9 @@ const ClientsPage = () => {
       phone: client.phone || '',
       nationality: client.nationality || '',
       numberOfPeople: client.numberOfPeople || 1,
-      observations: '',
+      observations: client.observations || '',
+      hotelId: client.hotelId || client.hotel?.id || '',
+      roomNumber: client.roomNumber || '',
     });
     setIsModalOpen(true);
   };
@@ -78,11 +114,16 @@ const ClientsPage = () => {
     event.preventDefault();
     setMessage('');
     try {
+      const payload = {
+        ...form,
+        hotelId: form.hotelId ? Number(form.hotelId) : null,
+      };
+
       if (editingClientId) {
-        await api.patch(`/v1/clients/${editingClientId}`, form);
+        await api.patch(`/v1/clients/${editingClientId}`, payload);
         setMessage('Cliente actualizado correctamente.');
       } else {
-        await api.post('/v1/clients', form);
+        await api.post('/v1/clients', payload);
         setMessage('Cliente creado correctamente.');
       }
       resetForm();
@@ -95,7 +136,8 @@ const ClientsPage = () => {
 
   const filteredClients = clients.filter((client) => {
     const query = search.toLowerCase();
-    return [client.fullName, client.documentNumber, client.email, client.phone]
+    const hotelName = client.hotel?.name || '';
+    return [client.fullName, client.documentNumber, client.email, client.phone, client.nationality, hotelName]
       .filter(Boolean)
       .some((value) => String(value).toLowerCase().includes(query));
   });
@@ -104,15 +146,15 @@ const ClientsPage = () => {
     <div className="min-h-screen bg-[#F6F8FC] p-8 text-slate-900 font-sans">
       <div className="mx-auto max-w-6xl">
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Clientes</h1>
-        <p className="mt-1 text-sm text-slate-500">Registro y búsqueda rápida de clientes.</p>
+        <p className="mt-1 text-sm text-slate-500">Registro y búsqueda rápida de clientes con su información de hospedaje.</p>
 
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
           <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <h2 className="text-lg font-bold text-slate-900">Listado de clientes</h2>
+            <h2 className="text-lg font-bold text-slate-900">Listado de clientes ({filteredClients.length})</h2>
             <div className="flex flex-wrap gap-2">
               <input
                 className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#4361EE] focus:ring-2 focus:ring-[#4361EE]/20"
-                placeholder="Buscar por nombre o documento..."
+                placeholder="Buscar por nombre, documento o hotel..."
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
               />
@@ -131,23 +173,54 @@ const ClientsPage = () => {
                 <tr>
                   <th className="p-3.5">Nombre</th>
                   <th className="p-3.5">Documento</th>
-                  <th className="p-3.5">Correo</th>
-                  <th className="p-3.5">Teléfono</th>
+                  <th className="p-3.5">Hotel Asociado</th>
+                  <th className="p-3.5">Contacto</th>
+                  <th className="p-3.5">Nacionalidad</th>
                   <th className="p-3.5 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredClients.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="p-6 text-center text-slate-400">No se encontraron clientes registrados.</td>
+                    <td colSpan={6} className="p-6 text-center text-slate-400">No se encontraron clientes registrados.</td>
                   </tr>
                 ) : (
                   filteredClients.map((client) => (
                     <tr key={client.id} className="border-b border-slate-100 hover:bg-slate-50/70 transition">
-                      <td className="p-3.5 font-semibold text-slate-900">{client.fullName}</td>
-                      <td className="p-3.5 text-slate-600">{client.documentNumber}</td>
-                      <td className="p-3.5 text-slate-600">{client.email || '—'}</td>
-                      <td className="p-3.5 text-slate-600">{client.phone || '—'}</td>
+                      <td className="p-3.5">
+                        <div className="font-semibold text-slate-900">{client.fullName}</div>
+                        <div className="text-xs text-slate-400">{client.numberOfPeople} persona(s)</div>
+                      </td>
+                      <td className="p-3.5 text-slate-600 font-mono text-xs">{client.documentNumber}</td>
+                      <td className="p-3.5">
+                        {client.hotel ? (
+                          <div>
+                            <div className="font-semibold text-slate-800 flex items-center gap-1.5">
+                              🏨 {client.hotel.name}
+                              {client.roomNumber ? (
+                                <span className="rounded bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 text-[11px] font-medium text-indigo-700">
+                                  Hab. {client.roomNumber}
+                                </span>
+                              ) : null}
+                            </div>
+                            {client.hotel.zone ? (
+                              <div className="text-xs text-slate-400">{client.hotel.zone} {client.hotel.sector ? `• ${client.hotel.sector}` : ''}</div>
+                            ) : null}
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 text-xs italic">Sin hotel asignado</span>
+                        )}
+                      </td>
+                      <td className="p-3.5 text-slate-600 text-xs">
+                        {client.email ? <div>{client.email}</div> : null}
+                        {client.phone ? <div className="text-slate-500">{client.phone}</div> : null}
+                        {!client.email && !client.phone ? '—' : null}
+                      </td>
+                      <td className="p-3.5 text-slate-600">
+                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                          {client.nationality}
+                        </span>
+                      </td>
                       <td className="p-3.5 text-right">
                         <button
                           className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-slate-900 transition"
@@ -200,6 +273,35 @@ const ClientsPage = () => {
                       required
                     />
                   </div>
+
+                  {/* Dropdown de Hoteles */}
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-slate-700">Hotel de Hospedaje</label>
+                    <select
+                      className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900 outline-none transition focus:border-[#4361EE] focus:ring-2 focus:ring-[#4361EE]/20"
+                      value={form.hotelId || ''}
+                      onChange={(event) => setForm({ ...form, hotelId: event.target.value })}
+                    >
+                      <option value="">-- Seleccionar Hotel en Cartagena --</option>
+                      {hotels.map((hotel) => (
+                        <option key={hotel.id} value={hotel.id}>
+                          {hotel.name} {hotel.zone ? `(${hotel.zone})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Número de Habitación */}
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold text-slate-700">Número de Habitación</label>
+                    <input
+                      className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#4361EE] focus:ring-2 focus:ring-[#4361EE]/20"
+                      placeholder="Ej: 304, 102-B"
+                      value={form.roomNumber}
+                      onChange={(event) => setForm({ ...form, roomNumber: event.target.value })}
+                    />
+                  </div>
+
                   <div>
                     <label className="mb-1 block text-xs font-semibold text-slate-700">Correo electrónico</label>
                     <input

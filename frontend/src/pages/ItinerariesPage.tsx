@@ -105,8 +105,8 @@ const ItinerariesPage = () => {
       setClients(clientsResponse.data || []);
       setActivities(activitiesResponse.data || []);
       setSchedules(schedulesResponse.data || []);
-    } catch {
-      // fallback
+    } catch (error) {
+      console.error('Error loading itinerary data:', error);
     }
   };
 

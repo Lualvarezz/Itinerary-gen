@@ -19,11 +19,11 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  createdClients Client[]
-  createdActivities Activity[]
-  createdSchedules Schedule[]
+  createdClients      Client[]
+  createdActivities   Activity[]
+  createdSchedules    Schedule[]
   operatedItineraries Itinerary[]
-  hotels       Hotel[]
+  hotels              Hotel[]
 
   @@map("users")
 }
@@ -44,18 +44,20 @@ model AgencyProfile {
 }
 
 model Hotel {
-  id          Int      @id @default(autoincrement())
-  name        String
-  zone        String?
-  sector      String?
-  contactPhone String?
-  commissionRate Decimal  @db.Decimal(5, 2)
-  userId      String   @map("user_id")
-  user        User     @relation(fields: [userId], references: [id])
-  // removed - junction table between TourPlan and Activity
-  status      String   @default("active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id             Int      @id @default(autoincrement())
+  name           String
+  address        String?
+  zone           String?
+  sector         String?
+  contactPhone   String?  @map("contact_phone")
+  commissionRate Decimal  @default(10.00) @map("commission_rate") @db.Decimal(5, 2)
+  userId         String   @map("user_id")
+  user           User     @relation(fields: [userId], references: [id])
+  status         String   @default("active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  clients        Client[]
 
   @@map("hotels")
 }
@@ -90,89 +92,91 @@ model TouristPlace {
 }
 
 model Activity {
-  id                 Int      @id @default(autoincrement())
-  name               String
-  description        String?
-  price              Decimal  @db.Decimal(10, 2)
-  durationMinutes    Int      @map("duration_minutes")
-  touristPlaceId     Int      @map("tourist_place_id")
-  categoryId         Int      @map("category_id")
-  imageUrl           String?  @map("image_url")
-  status             String   @default("available")
-  createdByUserId    String   @map("created_by_user_id")
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String?
+  price           Decimal  @db.Decimal(10, 2)
+  durationMinutes Int      @map("duration_minutes")
+  touristPlaceId  Int      @map("tourist_place_id")
+  categoryId      Int      @map("category_id")
+  imageUrl        String?  @map("image_url")
+  status          String   @default("available")
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
-  touristPlace       TouristPlace @relation(fields: [touristPlaceId], references: [id])
-  category           Category     @relation(fields: [categoryId], references: [id])
-  createdBy          User         @relation(fields: [createdByUserId], references: [id])
+  touristPlace       TouristPlace       @relation(fields: [touristPlaceId], references: [id])
+  category           Category           @relation(fields: [categoryId], references: [id])
+  createdBy          User               @relation(fields: [createdByUserId], references: [id])
   schedules          Schedule[]
   itineraryItems     ItineraryItem[]
-  // removed - junction table between TourPlan and Activity
+  tourPlanActivities TourPlanActivity[]
 
   @@map("activities")
 }
 
 model Client {
-  id                Int      @id @default(autoincrement())
-  fullName          String   @map("full_name")
-  documentNumber    String   @unique @map("document_number")
-  email             String?
-  phone             String?
-  nationality       String
-  numberOfPeople    Int      @default(1) @map("number_of_people")
-  observations      String?
-  status            String   @default("active")
-  createdByUserId   String   @map("created_by_user_id")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  id                 Int      @id @default(autoincrement())
+  fullName           String   @map("full_name")
+  documentNumber     String   @unique @map("document_number")
+  email              String?
+  phone              String?
+  nationality        String
+  numberOfPeople     Int      @default(1) @map("number_of_people")
+  acquisitionChannel String?  @default("Recomendación de Hotel") @map("acquisition_channel")
+  observations       String?
+  status             String   @default("active")
+  createdByUserId    String   @map("created_by_user_id")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
-  hotelId           Int?     @map("hotel_id")
-  roomNumber        String?
-  createdBy         User        @relation(fields: [createdByUserId], references: [id])
+  hotelId            Int?     @map("hotel_id")
+  roomNumber         String?  @map("room_number")
+  hotel              Hotel?   @relation(fields: [hotelId], references: [id])
+  createdBy          User     @relation(fields: [createdByUserId], references: [id])
 
-  itineraries       Itinerary[]
+  itineraries        Itinerary[]
 
   @@map("clients")
 }
 
 model Schedule {
-  id               Int      @id @default(autoincrement())
-  activityId       Int      @map("activity_id")
-  scheduleDate     DateTime @map("schedule_date") @db.Date
-  startTime        DateTime @map("start_time") @db.Time(0)
-  endTime          DateTime @map("end_time") @db.Time(0)
-  capacity         Int
-  availableSlots   Int      @default(0) @map("available_slots")
-  status           String   @default("available")
-  createdByUserId  String   @map("created_by_user_id")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  id              Int      @id @default(autoincrement())
+  activityId      Int      @map("activity_id")
+  scheduleDate    DateTime @map("schedule_date") @db.Date
+  startTime       DateTime @map("start_time") @db.Time(0)
+  endTime         DateTime @map("end_time") @db.Time(0)
+  capacity        Int
+  availableSlots  Int      @default(0) @map("available_slots")
+  status          String   @default("available")
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
-  activity         Activity @relation(fields: [activityId], references: [id])
-  createdBy        User     @relation(fields: [createdByUserId], references: [id])
-  itineraryItems   ItineraryItem[]
+  activity        Activity        @relation(fields: [activityId], references: [id])
+  createdBy       User            @relation(fields: [createdByUserId], references: [id])
+  itineraryItems  ItineraryItem[]
 
   @@map("schedules")
 }
 
 model Itinerary {
-  id             Int      @id @default(autoincrement())
-  clientId       Int      @map("client_id")
-  operatorUserId String   @map("operator_user_id")
-  createdAt      DateTime @default(now()) @map("created_at")
-  status         String   @default("draft")
+  id             Int       @id @default(autoincrement())
+  clientId       Int       @map("client_id")
+  operatorUserId String    @map("operator_user_id")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  status         String    @default("draft")
   observations   String?
-  totalAmount    Decimal  @default(0) @map("total_amount") @db.Decimal(12, 2)
-  isComplete     Boolean  @default(false) @map("is_complete")
+  totalAmount    Decimal   @default(0) @map("total_amount") @db.Decimal(12, 2)
+  isComplete     Boolean   @default(false) @map("is_complete")
   completedAt    DateTime? @map("completed_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  publicToken    String   @unique
-  feedbackStatus String   @default("pending")
+  publicToken    String    @default(uuid()) @unique @map("public_token")
+  feedbackStatus String    @default("pending") @map("feedback_status")
 
-  client         Client @relation(fields: [clientId], references: [id])
-  operator       User   @relation(fields: [operatorUserId], references: [id])
+  client         Client          @relation(fields: [clientId], references: [id])
+  operator       User            @relation(fields: [operatorUserId], references: [id])
   items          ItineraryItem[]
 
   @@map("itineraries")
@@ -191,51 +195,53 @@ model ItineraryItem {
   itinerary      Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
   activity       Activity  @relation(fields: [activityId], references: [id])
   schedule       Schedule  @relation(fields: [scheduleId], references: [id])
+  reviews        Review[]
 
   @@unique([itineraryId, scheduleId], name: "itinerary_schedule_unique")
   @@map("itinerary_items")
 }
 
 model TourPlan {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  basePrice   Decimal
-  discountPercentage Decimal
-  status      String   @default("active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id                 Int                @id @default(autoincrement())
+  name               String
+  description        String
+  basePrice          Decimal            @map("base_price") @db.Decimal(10, 2)
+  discountPercentage Decimal            @map("discount_percentage") @db.Decimal(5, 2)
+  status             String             @default("active")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
 
-  // removed - junction table between TourPlan and Activity
+  activities         TourPlanActivity[]
 
   @@map("tour_plans")
 }
 
 model TourPlanActivity {
-  id              Int      @id @default(autoincrement())
-  tourPlanId      Int
-  activityId      Int
-  quantityPeople Int
-  createdAt       DateTime @default(now()) @map("created_at")
+  id             Int      @id @default(autoincrement())
+  tourPlanId     Int      @map("tour_plan_id")
+  activityId     Int      @map("activity_id")
+  quantityPeople Int      @map("quantity_people")
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  tourPlan        TourPlan @relation(fields: [tourPlanId], references: [id], onDelete: Cascade)
-  activity        Activity  @relation(fields: [activityId], references: [id])
+  tourPlan       TourPlan @relation(fields: [tourPlanId], references: [id], onDelete: Cascade)
+  activity       Activity @relation(fields: [activityId], references: [id])
 
   @@unique([tourPlanId, activityId], name: "tour_plan_activity_unique")
-
   @@map("tour_plan_activities")
 }
 
 model Review {
-  id                Int      @id @default(autoincrement())
-  itineraryItemId Int
-  ratingOverall     Int
-  ratingLunch       Int
-  ratingGuide       Int
-  ratingTransport   Int
-  comment           String?
-  clientIp          String
-  submittedAt       DateTime @default(now())
+  id              Int      @id @default(autoincrement())
+  itineraryItemId Int      @map("itinerary_item_id")
+  ratingOverall   Int      @map("rating_overall")
+  ratingLunch     Int      @map("rating_lunch")
+  ratingGuide     Int      @map("rating_guide")
+  ratingTransport Int      @map("rating_transport")
+  comment         String?
+  clientIp        String   @map("client_ip")
+  submittedAt     DateTime @default(now()) @map("submitted_at")
+
+  itineraryItem   ItineraryItem @relation(fields: [itineraryItemId], references: [id], onDelete: Cascade)
 
   @@map("reviews")
 }

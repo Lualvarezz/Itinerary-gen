@@ -77,3 +77,12 @@ export const deleteActivity = async (req: Request, res: Response, next: NextFunc
     next(error);
   }
 };
+
+export const listHotels = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const hotels = await catalogService.listHotels();
+    res.status(200).json(hotels);
+  } catch (error) {
+    next(error);
+  }
+};

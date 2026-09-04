@@ -131,6 +131,22 @@ export const mockCategories: Category[] = [
   { id: 1, name: 'Excursiones', description: 'Actividades guiadas en Cartagena', status: 'active' },
 ];
 
+// Mock Real Cartagena Hotels
+export const mockHotels = [
+  { id: 1, name: 'Sofitel Legend Santa Clara', address: 'Calle del Torno # 39-29', zone: 'Centro Histórico', sector: 'San Diego' },
+  { id: 2, name: 'Hotel Charleston Santa Teresa', address: 'Carrera 3 # 31-23', zone: 'Centro Histórico', sector: 'Plaza Santa Teresa' },
+  { id: 3, name: 'Hotel Casa San Agustín', address: 'Calle de la Universidad # 36-44', zone: 'Centro Histórico', sector: 'Centro' },
+  { id: 4, name: 'Hotel Bantu Boutique', address: 'Calle de la Tablada # 7-62', zone: 'Centro Histórico', sector: 'San Diego' },
+  { id: 5, name: 'Selina Getsemaní', address: 'Calle del Arsenal # 10-41', zone: 'Getsemaní', sector: 'Calle del Arsenal' },
+  { id: 6, name: 'Hotel GDM Getsemaní', address: 'Calle del Guerrero # 29-57', zone: 'Getsemaní', sector: 'Calle del Guerrero' },
+  { id: 7, name: 'Hotel Casa Lola Deluxe Gallery', address: 'Calle del Guerrero # 29-108', zone: 'Getsemaní', sector: 'Calle del Guerrero' },
+  { id: 8, name: 'Hyatt Regency Cartagena', address: 'Carrera 1 # 12-118', zone: 'Bocagrande', sector: 'Carrera 1' },
+  { id: 9, name: 'Hotel Estelar Bocagrande', address: 'Carrera 1 # 11-116', zone: 'Bocagrande', sector: 'Carrera 1' },
+  { id: 10, name: 'Hotel Las Américas', address: 'Anillo Vial, Sector Cielo Mar', zone: 'Zona Norte', sector: 'Cielo Mar' },
+  { id: 11, name: 'Hotel Decameron Barú', address: 'Isla Barú, Sector Portonaito', zone: 'Zona Insular', sector: 'Isla Barú' },
+  { id: 12, name: 'Hilton Cartagena', address: 'Avenida San Martín, El Laguito', zone: 'Bocagrande', sector: 'El Laguito' },
+];
+
 // Mock 15 Test Clients with nationalities
 export const mockClients = [
   { id: 1, fullName: 'Cliente 1 Colombiana', documentNumber: '101000001', email: 'cliente1@example.com', phone: '3001000001', nationality: 'Colombiana', numberOfPeople: 2, observations: 'Cliente de prueba', status: 'active', hotelId: 1 },

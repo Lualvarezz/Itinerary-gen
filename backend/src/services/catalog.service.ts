@@ -68,4 +68,8 @@ export class CatalogService {
   async deleteActivity(id: number) {
     return this.catalogRepository.deleteActivity(id);
   }
+
+  async listHotels() {
+    return this.catalogRepository.listHotels();
+  }
 }

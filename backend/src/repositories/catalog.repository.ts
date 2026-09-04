@@ -95,4 +95,12 @@ export class CatalogRepository {
       where: { id },
     });
   }
+
+  async listHotels() {
+    return prisma.hotel.findMany({
+      where: { status: 'active' },
+      orderBy: { name: 'asc' },
+      take: 20,
+    });
+  }
 }

@@ -7,6 +7,7 @@ import {
   deleteActivity,
   listActivities,
   listCategories,
+  listHotels,
   listTouristPlaces,
   updateActivity,
 } from '../../controllers/catalog.controller.js';
@@ -23,5 +24,6 @@ router.get('/activities', listActivities);
 router.post('/activities', createActivity);
 router.patch('/activities/:id', updateActivity);
 router.delete('/activities/:id', deleteActivity);
+router.get('/hotels', listHotels);
 
 export default router;
