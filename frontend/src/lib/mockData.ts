@@ -1,6 +1,6 @@
-import { Activity } from '../types/activity';
-import { TouristPlace } from '../types/tourist-place';
-import { Category } from '../types/category';
+export type Category = { id: number; name: string; description?: string; status?: string };
+export type TouristPlace = { id: number; name: string; description?: string; city?: string; location?: string; imageUrl?: string; status?: string };
+export type Activity = { id: number; name: string; description?: string; price: number; durationMinutes: number; touristPlaceId: number; categoryId: number; imageUrl?: string; status?: string };
 
 // Mock Tour Data - 10 Tours Reales de Cartagena with prices in COP
 export const mockTours: Activity[] = [

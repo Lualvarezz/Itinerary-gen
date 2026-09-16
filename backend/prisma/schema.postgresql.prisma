@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -49,7 +50,7 @@ model Hotel {
   zone           String?
   sector         String?
   contactPhone   String?  @map("contact_phone")
-  commissionRate Decimal  @default(10.00) @map("commission_rate")
+  commissionRate Decimal  @default(10.00) @map("commission_rate") @db.Decimal(5, 2)
   userId         String   @map("user_id")
   user           User     @relation(fields: [userId], references: [id])
   status         String   @default("active")
@@ -94,7 +95,7 @@ model Activity {
   id              Int      @id @default(autoincrement())
   name            String
   description     String?
-  price           Decimal
+  price           Decimal  @db.Decimal(10, 2)
   durationMinutes Int      @map("duration_minutes")
   touristPlaceId  Int      @map("tourist_place_id")
   categoryId      Int      @map("category_id")
@@ -142,9 +143,9 @@ model Client {
 model Schedule {
   id              Int      @id @default(autoincrement())
   activityId      Int      @map("activity_id")
-  scheduleDate    DateTime @map("schedule_date")
-  startTime       DateTime @map("start_time")
-  endTime         DateTime @map("end_time")
+  scheduleDate    DateTime @map("schedule_date") @db.Date
+  startTime       DateTime @map("start_time") @db.Time(0)
+  endTime         DateTime @map("end_time") @db.Time(0)
   capacity        Int
   availableSlots  Int      @default(0) @map("available_slots")
   status          String   @default("available")
@@ -166,7 +167,7 @@ model Itinerary {
   createdAt      DateTime  @default(now()) @map("created_at")
   status         String    @default("draft")
   observations   String?
-  totalAmount    Decimal   @default(0) @map("total_amount")
+  totalAmount    Decimal   @default(0) @map("total_amount") @db.Decimal(12, 2)
   isComplete     Boolean   @default(false) @map("is_complete")
   completedAt    DateTime? @map("completed_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
@@ -187,8 +188,8 @@ model ItineraryItem {
   activityId     Int      @map("activity_id")
   scheduleId     Int      @map("schedule_id")
   quantityPeople Int      @map("quantity_people")
-  unitPrice      Decimal  @map("unit_price")
-  subtotal       Decimal
+  unitPrice      Decimal  @map("unit_price") @db.Decimal(10, 2)
+  subtotal       Decimal  @db.Decimal(10, 2)
   createdAt      DateTime @default(now()) @map("created_at")
 
   itinerary      Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
@@ -204,8 +205,8 @@ model TourPlan {
   id                 Int                @id @default(autoincrement())
   name               String
   description        String
-  basePrice          Decimal            @map("base_price")
-  discountPercentage Decimal            @map("discount_percentage")
+  basePrice          Decimal            @map("base_price") @db.Decimal(10, 2)
+  discountPercentage Decimal            @map("discount_percentage") @db.Decimal(5, 2)
   status             String             @default("active")
   createdAt          DateTime           @default(now()) @map("created_at")
   updatedAt          DateTime           @updatedAt @map("updated_at")
