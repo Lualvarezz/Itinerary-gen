@@ -83,6 +83,94 @@ type Summary = {
 const TOP3_COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#64748B', '#94A3B8', '#CBD5E1'];
 const PIE_COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EC4899', '#06B6D4', '#64748B'];
 
+// Tooltips personalizados para que cada barra y gráfico muestre información 100% dinámica
+const HotelTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="rounded-xl border border-slate-700 bg-slate-900/95 p-3 text-white shadow-xl text-xs space-y-1 backdrop-blur-xs">
+        <p className="font-bold text-sm text-blue-400 flex items-center gap-1">
+          🏨 <span>{data.hotelName}</span>
+        </p>
+        <p className="text-slate-300">
+          Clientes alojados: <strong className="text-white font-semibold">{data.clientCount} pax</strong>
+        </p>
+        <p className="text-slate-300">
+          Ingresos generados: <strong className="text-emerald-400 font-semibold">${Number(data.totalRevenue || 0).toLocaleString('es-CO')}</strong>
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
+const ModalityTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="rounded-xl border border-slate-700 bg-slate-900/95 p-3 text-white shadow-xl text-xs space-y-1 backdrop-blur-xs">
+        <p className="font-bold text-sm text-indigo-400 flex items-center gap-1">
+          🎯 <span>{data.activityName}</span>
+        </p>
+        <p className="text-slate-300">
+          Jornada / Horario: <span className="inline-block rounded-md bg-indigo-500/30 px-2 py-0.5 text-indigo-300 font-semibold">{data.schedulePeriod}</span>
+        </p>
+        <p className="text-slate-300">
+          Itinerarios reservados: <strong className="text-white font-semibold">{data.reservationCount} reserva(s)</strong>
+        </p>
+        <p className="text-slate-300">
+          Ventas acumuladas: <strong className="text-emerald-400 font-semibold">${Number(data.totalRevenue || 0).toLocaleString('es-CO')}</strong>
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
+const NationalityTooltip = ({ active, payload, total }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const totalCount = total || 1;
+    const pct = Math.round((data.count / totalCount) * 100);
+    return (
+      <div className="rounded-xl border border-slate-700 bg-slate-900/95 p-3 text-white shadow-xl text-xs space-y-1 backdrop-blur-xs">
+        <p className="font-bold text-sm text-purple-400 flex items-center gap-1">
+          🌎 <span>{data.nationality}</span>
+        </p>
+        <p className="text-slate-300">
+          Turistas registrados: <strong className="text-white font-semibold">{data.count} persona(s)</strong>
+        </p>
+        <p className="text-slate-300">
+          Porcentaje del total: <strong className="text-amber-400 font-semibold">{pct}%</strong>
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
+const ChannelTooltip = ({ active, payload, total }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const totalCount = total || 1;
+    const pct = Math.round((data.count / totalCount) * 100);
+    return (
+      <div className="rounded-xl border border-slate-700 bg-slate-900/95 p-3 text-white shadow-xl text-xs space-y-1 backdrop-blur-xs">
+        <p className="font-bold text-sm text-amber-400 flex items-center gap-1">
+          📣 <span>{data.channel}</span>
+        </p>
+        <p className="text-slate-300">
+          Clientes captados: <strong className="text-white font-semibold">{data.count} cliente(s)</strong>
+        </p>
+        <p className="text-slate-300">
+          Atribución: <strong className="text-blue-400 font-semibold">{pct}%</strong>
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
 const DashboardPage = () => {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -177,23 +265,33 @@ const DashboardPage = () => {
     totalRevenue: Number(item.totalRevenue ?? item.totalrevenue ?? 0),
   }));
 
-  const comparativeModalities = (summary?.comparativeModalities || []).map((item: any) => ({
-    activityName: item.activityName || item.activityname || 'Actividad',
-    schedulePeriod: item.schedulePeriod || item.scheduleperiod || 'Jornada',
-    reservationCount: Number(item.reservationCount ?? item.reservationcount ?? 0),
-    totalRevenue: Number(item.totalRevenue ?? item.totalrevenue ?? 0),
-  }));
+  const comparativeModalities = (summary?.comparativeModalities || []).map((item: any) => {
+    const activityName = item.activityName || item.activityname || 'Actividad';
+    const schedulePeriod = item.schedulePeriod || item.scheduleperiod || 'Jornada';
+    const shortAct = activityName.length > 15 ? activityName.slice(0, 13) + '...' : activityName;
+    return {
+      activityName,
+      schedulePeriod,
+      shortLabel: `${shortAct} (${schedulePeriod})`,
+      reservationCount: Number(item.reservationCount ?? item.reservationcount ?? 0),
+      totalRevenue: Number(item.totalRevenue ?? item.totalrevenue ?? 0),
+    };
+  });
 
   const channelDistribution = (summary?.channelDistribution || []).map((item: any) => ({
     channel: item.channel || 'Otros',
     count: Number(item.count ?? 0),
   }));
 
+  const totalClientsForChannels = channelDistribution.reduce((sum, item) => sum + item.count, 0) || 1;
+
   // Agrupación de Nacionalidades (Top 5 + "Otros") para evitar sobrecarga visual
   const rawNationalities = (summary?.nationalityDistribution || []).map((item: any) => ({
     nationality: item.nationality || 'No especificado',
     count: Number(item.count ?? 0),
   }));
+
+  const totalNationalitiesCount = rawNationalities.reduce((s, item) => s + item.count, 0) || 1;
 
   const sortedNationalities = [...rawNationalities].sort((a, b) => b.count - a.count);
   const top5Nationalities = sortedNationalities.slice(0, 5);
@@ -295,16 +393,11 @@ const DashboardPage = () => {
                 <p className="text-xs text-slate-500">Barras clasificadas destacando el Top 3 (Azul, Morado, Verde)</p>
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={clientsByHotel} margin={{ top: 10, right: 10, left: -10, bottom: 25 }}>
-                <XAxis dataKey="hotelName" stroke="#64748B" fontSize={11} interval={0} angle={-15} textAnchor="end" />
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart data={clientsByHotel} margin={{ top: 10, right: 10, left: -10, bottom: 45 }}>
+                <XAxis dataKey="hotelName" stroke="#64748B" fontSize={10} interval={0} angle={-25} textAnchor="end" />
                 <YAxis stroke="#64748B" fontSize={11} />
-                <Tooltip
-                  formatter={(value: any, name: any) => [
-                    name === 'clientCount' ? `${value} clientes` : `$${Number(value || 0).toLocaleString('es-CO')}`,
-                    name === 'clientCount' ? 'Clientes' : 'Ingresos',
-                  ]}
-                />
+                <Tooltip content={<HotelTooltip />} />
                 <Bar dataKey="clientCount" name="clientCount" barSize={18} radius={[4, 4, 0, 0]}>
                   {clientsByHotel.map((_, index) => (
                     <Cell key={`hotel-cell-${index}`} fill={TOP3_COLORS[index] || TOP3_COLORS[3]} />
@@ -327,11 +420,11 @@ const DashboardPage = () => {
               <p className="text-xs text-slate-500">Rendimiento por horario y variante de actividad</p>
               
               <div className="mt-4">
-                <ResponsiveContainer width="100%" height={260}>
-                  <BarChart data={comparativeModalities} margin={{ top: 10, right: 10, left: -10, bottom: 20 }}>
-                    <XAxis dataKey="schedulePeriod" stroke="#64748B" fontSize={11} />
+                <ResponsiveContainer width="100%" height={280}>
+                  <BarChart data={comparativeModalities} margin={{ top: 10, right: 10, left: -10, bottom: 45 }}>
+                    <XAxis dataKey="shortLabel" stroke="#64748B" fontSize={10} interval={0} angle={-20} textAnchor="end" />
                     <YAxis stroke="#64748B" fontSize={11} />
-                    <Tooltip formatter={(val: any) => [`${val} reservas`, 'Reservas']} />
+                    <Tooltip content={<ModalityTooltip />} />
                     <Bar dataKey="reservationCount" name="Reservas" barSize={22} radius={[4, 4, 0, 0]}>
                       {comparativeModalities.map((_, index) => (
                         <Cell key={`comp-cell-${index}`} fill={TOP3_COLORS[index % 3]} />
@@ -373,7 +466,7 @@ const DashboardPage = () => {
                 >
                   <XAxis type="number" stroke="#64748B" fontSize={11} />
                   <YAxis type="category" dataKey="nationality" stroke="#64748B" fontSize={11} width={90} />
-                  <Tooltip formatter={(val: any) => [`${val} turistas`, 'Cantidad']} />
+                  <Tooltip content={<NationalityTooltip total={totalNationalitiesCount} />} />
                   <Bar dataKey="count" barSize={16} radius={[0, 4, 4, 0]}>
                     {formattedNationalities.map((_, index) => (
                       <Cell key={`nat-cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
@@ -385,8 +478,7 @@ const DashboardPage = () => {
               <div className="space-y-2.5 bg-slate-50/70 p-4 rounded-xl border border-slate-100">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Desglose de Origen</p>
                 {formattedNationalities.map((n, idx) => {
-                  const total = rawNationalities.reduce((s, item) => s + item.count, 0) || 1;
-                  const pct = Math.round((n.count / total) * 100);
+                  const pct = Math.round((n.count / totalNationalitiesCount) * 100);
                   return (
                     <div key={n.nationality} className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
@@ -426,7 +518,7 @@ const DashboardPage = () => {
                       <Cell key={`chan-cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(val: any) => [`${val} clientes`, 'Clientes']} />
+                  <Tooltip content={<ChannelTooltip total={totalClientsForChannels} />} />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                 </PieChart>
               </ResponsiveContainer>

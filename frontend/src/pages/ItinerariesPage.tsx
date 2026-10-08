@@ -328,7 +328,17 @@ const ItinerariesPage = () => {
       setIsModalOpen(false);
       await loadData();
     } catch (err: any) {
-      setErrorMessage(err?.response?.data?.message || 'No se pudo generar el PDF del itinerario.');
+      let errorMsg = 'No se pudo generar el PDF del itinerario.';
+      if (err?.response?.data instanceof Blob) {
+        try {
+          const text = await err.response.data.text();
+          const json = JSON.parse(text);
+          if (json.message) errorMsg = json.message;
+        } catch {}
+      } else if (err?.response?.data?.message) {
+        errorMsg = err.response.data.message;
+      }
+      setErrorMessage(errorMsg);
     } finally {
       setIsGeneratingPdf(null);
     }
