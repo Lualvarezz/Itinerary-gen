@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import { mockItineraries, mockClients, mockTours } from '../lib/mockData';
 
 type Client = {
   id: number;
@@ -101,12 +102,28 @@ const ItinerariesPage = () => {
         api.get('/v1/itineraries/schedules'),
       ]);
 
-      setItineraries(itinerariesResponse.data || []);
-      setClients(clientsResponse.data || []);
-      setActivities(activitiesResponse.data || []);
+      const formatDate = (date: Date | string | undefined): string | undefined => {
+        if (!date) return undefined;
+        if (typeof date === 'string') return date;
+        return date.toISOString().split('T')[0];
+      };
+
+      setItineraries((itinerariesResponse.data || mockItineraries).map((i: any) => ({
+        ...i,
+        createdAt: formatDate(i.createdAt),
+      })));
+      setClients(clientsResponse.data || mockClients);
+      setActivities(activitiesResponse.data || mockTours);
       setSchedules(schedulesResponse.data || []);
     } catch (error) {
       console.error('Error loading itinerary data:', error);
+      setItineraries(mockItineraries.map((i: any) => ({
+        ...i,
+        createdAt: i.createdAt instanceof Date ? i.createdAt.toISOString().split('T')[0] : i.createdAt,
+      })));
+      setClients(mockClients);
+      setActivities(mockTours);
+      setSchedules([]);
     }
   };
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import { mockTours, mockCategories, mockTouristPlaces } from '../lib/mockData';
 
 type Schedule = {
   id: number;
@@ -97,11 +98,13 @@ const ActivitiesPage = () => {
         api.get('/v1/itineraries/schedules'),
       ]);
 
-      let cats = categoriesResponse.data;
-      let pls = placesResponse.data;
+      let cats = categoriesResponse.data ?? mockCategories;
+      let pls = placesResponse.data ?? mockTouristPlaces;
 
       // Seed por defecto si la base de datos está vacía para facilidad del operador
-      if (cats.length === 0) {
+      if ((cats.length === 0 || !categoriesResponse.data) && mockCategories.length > 0) {
+        cats = mockCategories;
+      } else if (cats.length === 0) {
         try {
           await api.post('/v1/catalog/categories', { name: 'Tours y Excursiones', description: 'Recorridos guiados' });
           await api.post('/v1/catalog/categories', { name: 'Náutica y Playas', description: 'Actividades en el mar' });
@@ -110,10 +113,13 @@ const ActivitiesPage = () => {
           cats = refreshedCats.data;
         } catch (error) {
           console.error('Error seeding categories:', error);
+          cats = mockCategories;
         }
       }
 
-      if (pls.length === 0) {
+      if ((pls.length === 0 || !placesResponse.data) && mockTouristPlaces.length > 0) {
+        pls = mockTouristPlaces;
+      } else if (pls.length === 0) {
         try {
           await api.post('/v1/catalog/tourist-places', { name: 'Centro Histórico / Ciudad Amurallada', city: 'Cartagena' });
           await api.post('/v1/catalog/tourist-places', { name: 'Islas del Rosario & Barú', city: 'Cartagena' });
@@ -122,15 +128,20 @@ const ActivitiesPage = () => {
           pls = refreshedPls.data;
         } catch (error) {
           console.error('Error seeding tourist places:', error);
+          pls = mockTouristPlaces;
         }
       }
 
-      setActivities(activitiesResponse.data);
+      setActivities(activitiesResponse.data ?? mockTours);
       setCategories(cats);
       setPlaces(pls);
-      setSchedules(schedulesResponse.data);
+      setSchedules(schedulesResponse.data ?? []);
     } catch (error) {
       console.error('Error loading activities data:', error);
+      setActivities(mockTours);
+      setCategories(mockCategories);
+      setPlaces(mockTouristPlaces);
+      setSchedules([]);
     }
   };
 
