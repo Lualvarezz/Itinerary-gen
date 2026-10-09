@@ -1,4 +1,5 @@
 export type Category = { id: number; name: string; description?: string; status?: string };
+export type Schedule = { id: number; activityId: number; scheduleDate: string; startTime: string; endTime: string; capacity: number; availableSlots: number; status: string };
 export type TouristPlace = { id: number; name: string; description?: string; city?: string; location?: string; imageUrl?: string; status?: string };
 export type Activity = { id: number; name: string; description?: string; price: number; durationMinutes: number; touristPlaceId: number; categoryId: number; imageUrl?: string; status?: string };
 

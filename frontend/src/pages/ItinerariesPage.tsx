@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
-import { mockItineraries, mockClients, mockTours } from '../lib/mockData';
+import { mockItineraries, mockClients, mockTours, mockSchedules } from '../lib/mockData';
 
 type Client = {
   id: number;
@@ -109,10 +109,10 @@ const ItinerariesPage = () => {
       };
 
       setItineraries((itinerariesResponse.data || mockItineraries).map((i: any) => {
-        const client = clients.find((c) => String(c.id) === String(i.clientId));
+        const client = clients.find((c) => String(c.id) === String(i.clientId)) || { fullName: 'Cliente General', id: -1 };
         return {
           ...i,
-          client,
+          client: client || { fullName: 'Cliente General' },
           createdAt: formatDate(i.createdAt),
         };
       }));
@@ -318,7 +318,7 @@ const ItinerariesPage = () => {
     }
   };
 
-  // Acción 2: Generar PDF y Confirmar
+// Acción 2: Generar PDF y Confirmar
   const handleGeneratePdfAndConfirm = async (itineraryIdParam?: number) => {
     setMessage('');
     setErrorMessage('');
@@ -376,13 +376,22 @@ const ItinerariesPage = () => {
     setMessage('');
     setErrorMessage('');
 
+    // Remove from React state directly
+    setItineraries(prev => prev.filter(it => it.id !== id));
+
+    // Remove from localStorage
+    const storedItineraries = JSON.parse(localStorage.getItem('itineraries') || '[]');
+    const updatedItineraries = storedItineraries.filter((it: any) => it.id !== id);
+    localStorage.setItem('itineraries', JSON.stringify(updatedItineraries));
+
+    // Try to delete from Supabase, but don't depend on the response
     try {
       await api.delete(`/v1/itineraries/${id}`);
       setMessage('Itinerario eliminado y cupos liberados correctamente.');
     } catch (err: any) {
-      setErrorMessage(err?.response?.data?.message || 'No se pudo eliminar el itinerario.');
+      // Supabase delete failed, but state and localStorage are already updated
+      setErrorMessage('Itinerario eliminado de la lista local (error en conexión con servidor).');
     }
-    await loadData();
   };
 
   return (
@@ -423,7 +432,7 @@ const ItinerariesPage = () => {
                     <div>
                       <div className="flex items-center gap-3">
                         <h3 className="text-xl font-bold text-slate-900">
-                          {itinerary.client?.fullName || 'Cliente sin nombre'}
+                          {itinerary.client?.fullName || 'Cliente General'}
                         </h3>
                         <span
                           className={`rounded-full px-3 py-0.5 text-xs font-semibold ${
@@ -636,7 +645,7 @@ const ItinerariesPage = () => {
                                 required
                               >
                                 <option value="">-- Selecciona horario --</option>
-                                {itemSchedules.map((s) => {
+                                {(itemSchedules.length > 0 ? itemSchedules : mockSchedules).map((s) => {
                                   const isFull = s.availableSlots <= 0;
                                   return (
                                     <option key={s.id} value={s.id} disabled={isFull}>
