@@ -437,4 +437,25 @@ export const mockDashboardInsights = {
   ],
 };
 
+// Mock Schedules/Turnos para actividades
+export const mockSchedules: Schedule[] = [
+  { id: 1, activityId: 1, scheduleDate: '2026-09-10', startTime: '09:00', endTime: '13:00', capacity: 20, availableSlots: 18, status: 'available' },
+  { id: 2, activityId: 1, scheduleDate: '2026-09-10', startTime: '14:00', endTime: '18:00', capacity: 20, availableSlots: 15, status: 'available' },
+  { id: 3, activityId: 2, scheduleDate: '2026-09-11', startTime: '10:00', endTime: '14:00', capacity: 15, availableSlots: 12, status: 'available' },
+  { id: 4, activityId: 2, scheduleDate: '2026-09-11', startTime: '15:00', endTime: '19:00', capacity: 15, availableSlots: 12, status: 'available' },
+  { id: 5, activityId: 3, scheduleDate: '2026-09-12', startTime: '09:00', endTime: '12:00', capacity: 10, availableSlots: 10, status: 'available' },
+  { id: 6, activityId: 4, scheduleDate: '2026-09-13', startTime: '08:00', endTime: '16:00', capacity: 25, availableSlots: 25, status: 'available' },
+  { id: 7, activityId: 5, scheduleDate: '2026-09-14', startTime: '10:00', endTime: '14:00', capacity: 12, availableSlots: 6, status: 'limited' },
+  { id: 8, activityId: 6, scheduleDate: '2026-09-15', startTime: '09:00', endTime: '17:00', capacity: 30, availableSlots: 30, status: 'available' },
+  { id: 9, activityId: 7, scheduleDate: '2026-09-16', startTime: '20:00', endTime: '22:00', capacity: 15, availableSlots: 15, status: 'available' },
+  { id: 10, activityId: 8, scheduleDate: '2026-09-17', startTime: '09:00', endTime: '15:00', capacity: 20, availableSlots: 18, status: 'available' },
+  { id: 11, activityId: 9, scheduleDate: '2026-09-18', startTime: '21:00', endTime: '23:00', capacity: 15, availableSlots: 15, status: 'available' },
+  { id: 12, activityId: 10, scheduleDate: '2026-09-19', startTime: '10:00', endTime: '14:00', capacity: 18, availableSlots: 18, status: 'available' },
+  { id: 13, activityId: 11, scheduleDate: '2026-09-20', startTime: '09:00', endTime: '13:00', capacity: 15, availableSlots: 12, status: 'available' },
+  { id: 14, activityId: 12, scheduleDate: '2026-09-21', startTime: '14:00', endTime: '18:00', capacity: 20, availableSlots: 5, status: 'limited' },
+  { id: 15, activityId: 13, scheduleDate: '2026-09-22', startTime: '16:00', endTime: '20:00', capacity: 10, availableSlots: 10, status: 'available' },
+  { id: 16, activityId: 14, scheduleDate: '2026-09-23', startTime: '10:00', endTime: '16:00', capacity: 25, availableSlots: 22, status: 'available' },
+  { id: 17, activityId: 15, scheduleDate: '2026-09-24', startTime: '09:00', endTime: '13:00', capacity: 15, availableSlots: 15, status: 'available' },
+];
+
 // All mock data is exported individually via export const above

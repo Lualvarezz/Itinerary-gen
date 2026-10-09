@@ -108,13 +108,17 @@ const ItinerariesPage = () => {
         return date.toISOString().split('T')[0];
       };
 
-      setItineraries((itinerariesResponse.data || mockItineraries).map((i: any) => ({
-        ...i,
-        createdAt: formatDate(i.createdAt),
-      })));
+      setItineraries((itinerariesResponse.data || mockItineraries).map((i: any) => {
+        const client = clients.find((c) => String(c.id) === String(i.clientId));
+        return {
+          ...i,
+          client,
+          createdAt: formatDate(i.createdAt),
+        };
+      }));
       setClients(clientsResponse.data || mockClients);
       setActivities(activitiesResponse.data || mockTours);
-      setSchedules(schedulesResponse.data || []);
+      setSchedules(schedulesResponse.data || mockSchedules);
     } catch (error) {
       console.error('Error loading itinerary data:', error);
       setItineraries(mockItineraries.map((i: any) => ({
@@ -332,7 +336,8 @@ const ItinerariesPage = () => {
       setIsGeneratingPdf(targetId);
 
       const response = await api.post(`/v1/itineraries/${targetId}/generate-pdf`, {}, { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const blob = response.data;
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `itinerario-${targetId}.pdf`);
@@ -345,17 +350,22 @@ const ItinerariesPage = () => {
       setIsModalOpen(false);
       await loadData();
     } catch (err: any) {
-      let errorMsg = 'No se pudo generar el PDF del itinerario.';
+      let errorMsg = '';
       if (err?.response?.data instanceof Blob) {
         try {
           const text = await err.response.data.text();
           const json = JSON.parse(text);
-          if (json.message) errorMsg = json.message;
-        } catch {}
+          errorMsg = json.message || 'No se pudo generar el PDF del itinerario.';
+        } catch {
+          errorMsg = 'No se pudo generar el PDF del itinerario (respuesta inválida).';
+        }
       } else if (err?.response?.data?.message) {
         errorMsg = err.response.data.message;
+      } else {
+        errorMsg = 'No se pudo generar el PDF del itinerario. Verifique la conexión con el servidor.';
       }
       setErrorMessage(errorMsg);
+      console.error('PDF generation error:', err);
     } finally {
       setIsGeneratingPdf(null);
     }
@@ -369,10 +379,10 @@ const ItinerariesPage = () => {
     try {
       await api.delete(`/v1/itineraries/${id}`);
       setMessage('Itinerario eliminado y cupos liberados correctamente.');
-      await loadData();
     } catch (err: any) {
       setErrorMessage(err?.response?.data?.message || 'No se pudo eliminar el itinerario.');
     }
+    await loadData();
   };
 
   return (

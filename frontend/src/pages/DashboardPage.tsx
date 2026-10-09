@@ -182,7 +182,7 @@ const DashboardPage = () => {
         setSummary(data);
       } catch {
         // Fallback a datos mock para desarrollo local
-        const clientsCount = mockClients.length;
+const clientsCount = mockClients.length;
         const activitiesCount = mockTours.length;
         const itinerariesCount = mockItineraries.length;
         const schedulesCount = 5;
@@ -202,6 +202,8 @@ const DashboardPage = () => {
             { hotelName: 'Sofitel Santa Clara', clientCount: 20, totalRevenue: 2800000 },
             { hotelName: 'Hotel Estelar', clientCount: 15, totalRevenue: 2000000 },
             { hotelName: 'Hyatt Regency', clientCount: 8, totalRevenue: 1200000 },
+            { hotelName: 'Hotel GDM Getsemaní', clientCount: 10, totalRevenue: 800000 },
+            { hotelName: 'Hotel Casa Lola', clientCount: 12, totalRevenue: 950000 },
           ],
           nationalityDistribution: [
             { nationality: 'Colombia', count: 55 },
@@ -209,21 +211,23 @@ const DashboardPage = () => {
             { nationality: 'México', count: 18 },
             { nationality: 'Argentina', count: 12 },
             { nationality: 'España', count: 9 },
-            { nationality: 'Chile', count: 7 },
-            { nationality: 'Brasil', count: 5 },
-            { nationality: 'Perú', count: 4 },
+            { nationality: 'Otros', count: 11 },
           ],
           channelDistribution: [
             { channel: 'Instagram', count: 32 },
             { channel: 'Recomendación Hotelera', count: 25 },
             { channel: 'Sitio Web Directo', count: 18 },
             { channel: 'WhatsApp / Asesor', count: 12 },
+            { channel: 'Facebook Ads', count: 8 },
+            { channel: 'Referidos', count: 5 },
           ],
           comparativeModalities: [
             { activityName: 'Citytour', schedulePeriod: 'Mañana', reservationCount: 45, totalRevenue: 5200000 },
             { activityName: 'Citytour', schedulePeriod: 'Tarde', reservationCount: 25, totalRevenue: 2800000 },
             { activityName: 'Pasadía Barú', schedulePeriod: 'Día Completo', reservationCount: 30, totalRevenue: 4500000 },
             { activityName: 'Pasadía Rosario', schedulePeriod: 'Día Completo', reservationCount: 18, totalRevenue: 2500000 },
+            { activityName: 'Pasadía Totumo', schedulePeriod: 'Mañana', reservationCount: 20, totalRevenue: 3000000 },
+            { activityName: 'Chiva Rumbera', schedulePeriod: 'Noche', reservationCount: 15, totalRevenue: 1275000 },
           ],
         });
       } finally {
