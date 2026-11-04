@@ -298,14 +298,14 @@ export class ItineraryRepository {
   }
 
   async confirmPdf(id: number) {
-    await prisma.$executeRaw`
-      UPDATE itineraries
-      SET status = 'confirmed'::itinerary_status,
-          updated_at = NOW(),
-          is_complete = true,
-          completed_at = NOW()
-      WHERE id = ${id}
-    `;
+    await prisma.itinerary.update({
+      where: { id },
+      data: {
+        status: 'confirmed',
+        isComplete: true,
+        completedAt: new Date(),
+      },
+    });
 
     return this.getById(id);
   }
