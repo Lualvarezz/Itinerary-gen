@@ -8,6 +8,14 @@ export const createActivitySchema = z.object({
   touristPlaceId: z.coerce.number().int().positive('Lugar turístico inválido'),
   categoryId: z.coerce.number().int().positive('Categoría inválida'),
   imageUrl: z.string().optional().nullable(),
+  meetingPoint: z.string().optional(),
+  meetingTime: z.string().optional(),
+  includesDrinks: z.boolean().optional(),
+  drinkDetails: z.string().optional(),
+  stops: z.string().optional(),
+  returnTime: z.string().optional(),
+  safetyNotes: z.string().optional(),
+  emergencyContacts: z.string().optional(),
   createdByUserId: z.string().optional(),
 });
 
